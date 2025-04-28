@@ -30,7 +30,7 @@ const MarketplaceSchema: Schema = new Schema(
     featured: { type: Boolean, required: true },
     skills: [{ type: String }],
   },
-  { collection: "marketplace_items" } // Explicitly set the collection name
+  { collection: "marketplace_items" }
 );
 
 export default mongoose.models.Marketplace ||

@@ -1,18 +1,18 @@
 import mongoose, { Schema, Document, models, Model, Types } from "mongoose";
 
 export interface IStudentOnboarding extends Document {
-  userId: Types.ObjectId; // Reference to the main User document's _id
-  clerkId: string; // Store Clerk ID for potential direct lookups
+  userId: Types.ObjectId;
+  clerkId: string;
   educationalGoals?: string;
   careerAspirations?: string;
-  preferredLearningStyle?: string; // e.g., 'visual', 'auditory', 'kinesthetic'
+  preferredLearningStyle?: string;
   skillsToDevelop?: string[];
-  fundingNeedReason?: string; // Why they need funding
+  fundingNeedReason?: string;
   location?: string;
   dateOfBirth?: Date;
-  currentEducationLevel?: string; // e.g., 'High School', 'Undergraduate'
+  currentEducationLevel?: string;
   fieldOfStudy?: string;
-  onboardingData: Record<string, any>; // Catch-all for other form data
+  onboardingData: Record<string, any>;
   completedAt: Date;
 }
 
@@ -34,12 +34,12 @@ const StudentOnboardingSchema: Schema<IStudentOnboarding> = new Schema(
     dateOfBirth: { type: Date },
     currentEducationLevel: { type: String },
     fieldOfStudy: { type: String },
-    onboardingData: { type: Schema.Types.Mixed }, // Flexible field for extra data
+    onboardingData: { type: Schema.Types.Mixed },
     completedAt: { type: Date, default: Date.now },
   },
   {
-    timestamps: { createdAt: "completedAt", updatedAt: false }, // Only use completedAt
-    collection: "student-onboardings", // Explicit collection name
+    timestamps: { createdAt: "completedAt", updatedAt: false },
+    collection: "student-onboardings",
   }
 );
 

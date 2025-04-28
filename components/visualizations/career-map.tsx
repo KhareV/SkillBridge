@@ -15,8 +15,6 @@ import {
   Building,
   CheckCircle,
 } from "lucide-react";
-
-// Current timestamp and user for component metadata
 const TIMESTAMP = "2025-04-05 23:22:35";
 const CURRENT_USER = "vkhare2909";
 
@@ -55,8 +53,6 @@ export function CareerMap({ data }: CareerMapProps) {
   const [simulationNodes, setSimulationNodes] = useState<Node[]>([]);
   const [simulationLinks, setSimulationLinks] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Default example data if none provided
   const defaultData = {
     nodes: [
       {
@@ -168,19 +164,13 @@ export function CareerMap({ data }: CareerMapProps) {
       { source: "senior", target: "lead", type: "path" },
     ],
   };
-
-  // Initialize with data or default
   useEffect(() => {
     const mapData = data || defaultData;
-
-    // Update nodes with layout positions
     const nodes = [...mapData.nodes].map((node) => ({
       ...node,
-      x: undefined, // Will be set by simulation
-      y: undefined, // Will be set by simulation
+      x: undefined,
+      y: undefined,
     })) as Node[];
-
-    // Format links for D3 simulation
     const links = mapData.links.map((link) => ({
       ...link,
       source: link.source,
@@ -190,8 +180,6 @@ export function CareerMap({ data }: CareerMapProps) {
     setSimulationNodes(nodes);
     setSimulationLinks(links);
   }, [data]);
-
-  // Handle window resize and initial dimensions
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -207,8 +195,6 @@ export function CareerMap({ data }: CareerMapProps) {
       window.removeEventListener("resize", updateDimensions);
     };
   }, []);
-
-  // Run D3 force simulation when dimensions or nodes/links change
   useEffect(() => {
     if (
       !svgRef.current ||
@@ -216,8 +202,6 @@ export function CareerMap({ data }: CareerMapProps) {
       simulationNodes.length === 0
     )
       return;
-
-    // Create force simulation
     const simulation = d3
       .forceSimulation(simulationNodes as any)
       .force(
@@ -233,8 +217,7 @@ export function CareerMap({ data }: CareerMapProps) {
         d3
           .forceX()
           .x((d: any) => {
-            // Position nodes based on level
-            const levelWidth = dimensions.width / 5; // 5 levels
+            const levelWidth = dimensions.width / 5;
             return levelWidth * d.level + levelWidth / 2;
           })
           .strength(1)
@@ -242,14 +225,9 @@ export function CareerMap({ data }: CareerMapProps) {
       .force("y", d3.forceY(dimensions.height / 2).strength(0.3))
       .force("collision", d3.forceCollide().radius(30))
       .on("tick", () => {
-        // Update node positions after each simulation tick
         setSimulationNodes([...(simulation.nodes() as any)]);
       });
-
-    // Run simulation for a fixed number of iterations
     simulation.alpha(1).restart();
-
-    // Stop simulation after a few seconds to save CPU
     const timer = setTimeout(() => {
       simulation.stop();
     }, 3000);
@@ -261,10 +239,10 @@ export function CareerMap({ data }: CareerMapProps) {
   }, [dimensions, simulationNodes.length, simulationLinks.length]);
 
   const getNodeColor = (node: Node) => {
-    if (node.status === "current") return "#60a5fa"; // blue-400
-    if (node.status === "completed") return "#34d399"; // emerald-400
-    if (node.status === "recommended") return "#c084fc"; // purple-400
-    return "#94a3b8"; // slate-400
+    if (node.status === "current") return "#60a5fa";
+    if (node.status === "completed") return "#34d399";
+    if (node.status === "recommended") return "#c084fc";
+    return "#94a3b8";
   };
 
   const getNodeIcon = (node: Node) => {
@@ -281,9 +259,9 @@ export function CareerMap({ data }: CareerMapProps) {
   };
 
   const getLinkColor = (link: Link) => {
-    if (link.type === "recommended") return "#c084fc"; // purple-400
-    if (link.type === "alternate") return "#94a3b8"; // slate-400
-    return "#60a5fa"; // blue-400
+    if (link.type === "recommended") return "#c084fc";
+    if (link.type === "alternate") return "#94a3b8";
+    return "#60a5fa";
   };
 
   const getLinkWidth = (link: Link) => {

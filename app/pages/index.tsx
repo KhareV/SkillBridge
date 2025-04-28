@@ -21,12 +21,9 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const [loading, setLoading] = useState(true);
-
-  // Improved transform values for smoother transitions
   const opacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.15], [1, 0.97]);
   useEffect(() => {
-    // Simulate API data loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -34,9 +31,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
-    // Create a GSAP context for better cleanup
     const ctx = gsap.context(() => {
-      // Enhanced animations with better timing and easing
       gsap.from(".fade-in", {
         opacity: 0,
         y: 30,
@@ -49,8 +44,6 @@ export default function Home() {
           toggleActions: "play none none none",
         },
       });
-
-      // Add reveal animations for sections
       gsap.utils.toArray(".section").forEach((section: any, i) => {
         gsap.from(section, {
           opacity: 0,

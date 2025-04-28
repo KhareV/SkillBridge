@@ -157,7 +157,6 @@ export default function Aurora(props: AuroraProps) {
 
     const geometry = new Triangle(gl);
     if (geometry.attributes.uv) {
-      // TypeScript may require a type assertion here.
       delete (geometry.attributes as any).uv;
     }
 

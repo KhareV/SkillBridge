@@ -12,29 +12,21 @@ import * as THREE from "three";
 import { Suspense } from "react";
 import { useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
-
-// Current user data
 const currentDateTime = "2025-03-04 06:40:40";
 const currentUser = "vkhare2909";
-
-// Performance configuration
 const CONFIG = {
-  pointCount: 300, // Reduced point count to favor performance
+  pointCount: 300,
   globeDetail: 64,
   showStats: process.env.NODE_ENV === "development",
   enableSelect: true,
   globeRadius: 1,
   atmosphereColor: "#4066ff",
 };
-
-// Updated texture paths for a daylight Earth
 const TEXTURE_PATHS = {
-  earthMap: "/textures/earth-blue-marble.jpg", // Daylight Earth texture
-  earthBumpMap: "/textures/earth-topology.png", // Topography for elevation
-  earthSpecularMap: "/textures/earth-water.png", // Water reflections
+  earthMap: "/textures/earth-blue-marble.jpg",
+  earthBumpMap: "/textures/earth-topology.png",
+  earthSpecularMap: "/textures/earth-water.png",
 };
-
-// Major world capital cities with their coordinates
 const CAPITAL_CITIES = [
   { name: "London", lat: 51.5074, lng: -0.1278, size: 1.2 },
   { name: "New York", lat: 40.7128, lng: -74.006, size: 1.3 },
@@ -52,8 +44,6 @@ const CAPITAL_CITIES = [
   { name: "Mumbai", lat: 19.076, lng: 72.8777, size: 1.0 },
   { name: "San Francisco", lat: 37.7749, lng: -122.4194, size: 0.9 },
 ];
-
-// Define major flight routes (connections between cities)
 const FLIGHT_ROUTES = [
   ["New York", "London"],
   ["London", "Tokyo"],
@@ -71,26 +61,19 @@ const FLIGHT_ROUTES = [
   ["Singapore", "Mumbai"],
   ["London", "Paris"],
 ];
-
-// Helper function to convert lat/lng to 3D position
 const latLngToVector3 = (
   lat: number,
   lng: number,
   radius: number = CONFIG.globeRadius
 ): THREE.Vector3 => {
-  // Convert to radians
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lng + 180) * (Math.PI / 180);
-
-  // Calculate position
   const x = -(radius * Math.sin(phi) * Math.cos(theta));
   const z = radius * Math.sin(phi) * Math.sin(theta);
   const y = radius * Math.cos(phi);
 
   return new THREE.Vector3(x, y, z);
 };
-
-// User activity tracking component
 const UserActivity = ({ visible = true }) => {
   const [activity, setActivity] = useState({
     rotations: 0,
@@ -126,10 +109,7 @@ const UserActivity = ({ visible = true }) => {
     </div>
   );
 };
-
-// Texture loading helper with built-in error handling
 const useGlobeTextures = () => {
-  // Use React Three Fiber's useLoader to load textures
   const [earthMap, earthBumpMap, earthSpecularMap] = useLoader(TextureLoader, [
     TEXTURE_PATHS.earthMap,
     TEXTURE_PATHS.earthBumpMap,
@@ -138,8 +118,6 @@ const useGlobeTextures = () => {
 
   return { earthMap, earthBumpMap, earthSpecularMap };
 };
-
-// City markers component
 const CityMarkers = ({
   onHover,
 }: {
@@ -147,8 +125,6 @@ const CityMarkers = ({
 }) => {
   const pointsRef = useRef<THREE.Group>(null);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
-
-  // Create city markers
   const cityPoints = useMemo(
     () =>
       CAPITAL_CITIES.map((city) => {
@@ -196,15 +172,11 @@ const CityMarkers = ({
     </group>
   );
 };
-
-// Flight paths component
 const FlightPaths = ({ animate = true }) => {
   const linesRef = useRef<THREE.Group>(null);
   const [flightProgress, setFlightProgress] = useState<number[]>(
     Array(FLIGHT_ROUTES.length).fill(0)
   );
-
-  // Create a map for city positions
   const cityPositions = useMemo(() => {
     const positions: { [key: string]: THREE.Vector3 } = {};
     CAPITAL_CITIES.forEach((city) => {
@@ -216,21 +188,16 @@ const FlightPaths = ({ animate = true }) => {
     });
     return positions;
   }, []);
-
-  // Animation for flights
   useFrame(({ clock }) => {
     if (animate && linesRef.current) {
       const newProgress = flightProgress.map((_, i) => {
-        // Different speeds for different routes
         const speed = 0.2 + (i % 5) * 0.05;
         const time = clock.getElapsedTime() * speed;
-        return (Math.sin(time + i * 0.5) + 1) / 2; // Normalized 0-1 value
+        return (Math.sin(time + i * 0.5) + 1) / 2;
       });
       setFlightProgress(newProgress);
     }
   });
-
-  // Generate flight paths
   return (
     <group ref={linesRef}>
       {FLIGHT_ROUTES.map((route, i) => {
@@ -240,8 +207,6 @@ const FlightPaths = ({ animate = true }) => {
         const endPos = cityPositions[endCity];
 
         if (!startPos || !endPos) return null;
-
-        // Create a curved path between the two points
         const midPoint = new THREE.Vector3()
           .addVectors(startPos, endPos)
           .multiplyScalar(0.5);
@@ -249,19 +214,13 @@ const FlightPaths = ({ animate = true }) => {
         midPoint
           .normalize()
           .multiplyScalar(CONFIG.globeRadius * 1.15 + distance * 0.15);
-
-        // Create a curve through these points
         const curve = new THREE.QuadraticBezierCurve3(
           startPos,
           midPoint,
           endPos
         );
-
-        // Sample points along the curve
         const points = curve.getPoints(50);
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-        // Get current flight position
         const flightPosition = curve.getPointAt(flightProgress[i]);
 
         return (
@@ -280,19 +239,13 @@ const FlightPaths = ({ animate = true }) => {
     </group>
   );
 };
-
-// Loadable Globe component
 const Globe = () => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState(false);
   const [hoveredCity, setHoveredCity] = useState<string | null>(null);
   const { viewport } = useThree();
-
-  // Load textures using our custom hook
   const { earthMap, earthBumpMap, earthSpecularMap } = useGlobeTextures();
-
-  // Effect for cursor style
   useEffect(() => {
     if (hovered || hoveredCity) {
       document.body.style.cursor = "pointer";
@@ -304,22 +257,15 @@ const Globe = () => {
       document.body.style.cursor = "auto";
     };
   }, [hovered, hoveredCity]);
-
-  // Animate globe rotation
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      // Slow down rotation when hovered
       const speed = hovered || hoveredCity ? 0.05 : 0.1;
       meshRef.current.rotation.y = clock.getElapsedTime() * speed;
     }
   });
-
-  // Calculate appropriate scale based on viewport
   const scale = useMemo(() => {
     return viewport.width > 10 ? 2 : viewport.width / 5;
   }, [viewport.width]);
-
-  // Handle pointer events
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setHovered(true);
@@ -394,12 +340,8 @@ const Globe = () => {
     </group>
   );
 };
-
-// Career opportunity points
 const CareerPoints = () => {
   const pointsRef = useRef<THREE.Points>(null);
-
-  // Animate points rotation
   useFrame(({ clock }) => {
     if (pointsRef.current) {
       pointsRef.current.rotation.y = clock.getElapsedTime() * 0.03;
@@ -407,8 +349,6 @@ const CareerPoints = () => {
         Math.sin(clock.getElapsedTime() * 0.2) * 0.1;
     }
   });
-
-  // Generate point data with a more optimized approach
   const { positions, colors, sizes } = useMemo(() => {
     const positions: number[] = [];
     const colors: number[] = [];
@@ -416,32 +356,23 @@ const CareerPoints = () => {
     const color = new THREE.Color();
 
     for (let i = 0; i < CONFIG.pointCount; i++) {
-      // Random spherical coordinates, but keep points further away from globe
-      const r = CONFIG.globeRadius * (1.2 + Math.random() * 0.5); // 1.2-1.7x radius
+      const r = CONFIG.globeRadius * (1.2 + Math.random() * 0.5);
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-
-      // Convert to Cartesian coordinates
       const x = r * Math.sin(phi) * Math.cos(theta);
       const y = r * Math.sin(phi) * Math.sin(theta);
       const z = r * Math.cos(phi);
 
       positions.push(x, y, z);
-
-      // Color based on position (create meaningful clusters)
       const hue = (theta / (Math.PI * 2)) * 0.3 + 0.5;
       color.setHSL(hue, 1, 0.6);
       colors.push(color.r, color.g, color.b);
-
-      // Varied sizes
       const size = 0.5 + Math.random();
       sizes.push(size);
     }
 
     return { positions, colors, sizes };
   }, []);
-
-  // Create and memoize geometry
   const geometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
@@ -467,8 +398,6 @@ const CareerPoints = () => {
     </points>
   );
 };
-
-// Main scene component
 const GlobeScene = () => {
   return (
     <>
@@ -497,8 +426,6 @@ const GlobeScene = () => {
     </>
   );
 };
-
-// Loading fallback component
 const LoadingFallback = () => {
   return (
     <Html center>
@@ -510,14 +437,10 @@ const LoadingFallback = () => {
     </Html>
   );
 };
-
-// Main component wrapper
 export default function GlobeVisualization() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [canvasHeight, setCanvasHeight] = useState("500px");
   const [isTextureLoading, setIsTextureLoading] = useState(true);
-
-  // Adjust canvas height based on container
   useEffect(() => {
     if (!wrapperRef.current) return;
 
@@ -534,8 +457,6 @@ export default function GlobeVisualization() {
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
-
-  // Setup for displaying texture information
   useEffect(() => {
     const timer = setTimeout(() => setIsTextureLoading(false), 800);
     return () => clearTimeout(timer);

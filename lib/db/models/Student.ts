@@ -3,7 +3,7 @@ import { IUser } from "./User";
 
 export interface ISkill {
   name: string;
-  level: number; // 1-100
+  level: number;
   isVerified: boolean;
   verificationId?: string;
 }
@@ -20,7 +20,7 @@ export interface IEducation {
 
 export interface IStudent extends Document {
   userId: mongoose.Types.ObjectId | IUser;
-  educationCredit: number; // 1-1000 score
+  educationCredit: number;
   skills: ISkill[];
   education: IEducation[];
   certifications: {

@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Proposal } from "@/types/blockchain";
-
-// Sample proposals data (in a real app, this would come from a database or smart contract)
 const PROPOSALS: Proposal[] = [
   {
     id: 1,
@@ -46,7 +44,6 @@ const PROPOSALS: Proposal[] = [
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    // Get all proposals or a specific one
     const { id } = req.query;
 
     if (id) {
@@ -61,8 +58,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     return res.status(200).json(PROPOSALS);
   } else if (req.method === "POST") {
-    // Vote on a proposal
-    // In a real app, this would update a database or call a smart contract
     const { proposalId, vote, address } = req.body;
 
     if (!proposalId || !vote || !address) {
@@ -80,8 +75,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         .status(400)
         .json({ message: "Cannot vote on inactive proposals" });
     }
-
-    // Update votes (in a real app, would check if user already voted)
     if (vote === "yes") {
       proposal.votes.yes += 1;
     } else if (vote === "no") {

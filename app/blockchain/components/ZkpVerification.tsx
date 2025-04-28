@@ -28,21 +28,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-
-// Simulated ZKP verification logic
-// In a real implementation, this would use actual ZKP libraries like snarkjs or circom
 const verifyWithZKP = async (
   aadharNumber: string,
   image: string
 ): Promise<VerificationResult> => {
   return new Promise((resolve) => {
-    // Simulate verification delay
     setTimeout(async () => {
       try {
-        // Create image hash
         const imageHash = await createImageHash(image);
-
-        // Call API endpoint for verification with image hash
         const response = await fetch("/api/blockchain/verify-zkp", {
           method: "POST",
           headers: {
@@ -69,11 +62,8 @@ const verifyWithZKP = async (
     }, 2000);
   });
 };
-
-// Helper function to create image hash
 async function createImageHash(imageData: string): Promise<string> {
   try {
-    // Convert the base64 image to array buffer for hashing
     const base64Data = imageData.split(",")[1];
     const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
@@ -81,23 +71,17 @@ async function createImageHash(imageData: string): Promise<string> {
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
-
-    // Use SubtleCrypto for hashing (browser Web Crypto API)
     const hashBuffer = await crypto.subtle.digest("SHA-256", bytes.buffer);
-
-    // Convert to hex string
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   } catch (error) {
     console.error("Error creating image hash:", error);
-
-    // Fallback to a simpler hash if SubtleCrypto fails
     let hash = 0;
-    const str = imageData.substring(0, 10000); // Use first 10000 chars
+    const str = imageData.substring(0, 10000);
 
     for (let i = 0; i < str.length; i++) {
       hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0;
     }
 
     return Math.abs(hash).toString(16).padStart(64, "0");
@@ -121,24 +105,15 @@ export default function ZkpVerification() {
   const [showProof, setShowProof] = useState(false);
   const [showIntroAnimation, setShowIntroAnimation] = useState(true);
   const [validationError, setValidationError] = useState<string | null>(null);
-
-  // For demo purposes we'll provide sample values
   const SAMPLE_AADHAR_NUMBER = "1234-5678-9012";
   const SAMPLE_AADHAR_IMAGE =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/x8AAuMB8DtXNJsAAAAASUVORK5CYII=";
-
-  // Disable intro animation after initial render
   useEffect(() => {
     const timer = setTimeout(() => setShowIntroAnimation(false), 500);
     return () => clearTimeout(timer);
   }, []);
-
-  // Format Aadhar number as user types (XXXX-XXXX-XXXX)
   const formatAadharNumber = (value: string) => {
-    // Remove non-numeric characters
     const numericValue = value.replace(/[^0-9]/g, "");
-
-    // Format with dashes
     if (numericValue.length <= 4) {
       return numericValue;
     } else if (numericValue.length <= 8) {
@@ -153,21 +128,17 @@ export default function ZkpVerification() {
 
   const handleAadharChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatAadharNumber(e.target.value);
-    setAadharNumber(formattedValue.slice(0, 14)); // Limit to XXXX-XXXX-XXXX format
-    setValidationError(null); // Clear validation error on change
+    setAadharNumber(formattedValue.slice(0, 14));
+    setValidationError(null);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-
-    // Check file size (limit to 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setValidationError("Image file size must be less than 5MB");
       return;
     }
-
-    // Check file type
     if (!file.type.startsWith("image/")) {
       setValidationError("File must be an image");
       return;
@@ -178,7 +149,7 @@ export default function ZkpVerification() {
       reader.onloadend = () => {
         if (typeof reader.result === "string") {
           setAadharImage(reader.result);
-          setValidationError(null); // Clear validation error on change
+          setValidationError(null);
         }
       };
       reader.readAsDataURL(file);
@@ -188,11 +159,10 @@ export default function ZkpVerification() {
   const useSampleData = () => {
     setAadharNumber(SAMPLE_AADHAR_NUMBER);
     setAadharImage(SAMPLE_AADHAR_IMAGE);
-    setValidationError(null); // Clear validation error when using sample data
+    setValidationError(null);
   };
 
   const verifyIdentity = async () => {
-    // Validate input fields
     if (!aadharNumber) {
       setValidationError("Please enter your Aadhar number");
       return;
@@ -213,11 +183,8 @@ export default function ZkpVerification() {
     setValidationError(null);
 
     try {
-      // Call the API with the actual data
       const result = await verifyWithZKP(aadharNumber, aadharImage);
       setVerificationResult(result);
-
-      // Store verification result if successful
       if (result.success) {
         try {
           localStorage.setItem("zkp_verified", "true");
@@ -236,8 +203,6 @@ export default function ZkpVerification() {
       setIsVerifying(false);
     }
   };
-
-  // Generate a simulated ZKP proof (for display purposes)
   const generateProof = () => {
     const chars = "0123456789abcdef";
     let proof = "";
@@ -254,29 +219,22 @@ export default function ZkpVerification() {
 
     return proof;
   };
-
-  // Reset the verification process
   const resetVerification = () => {
     setVerificationResult(null);
     setAadharNumber("");
     setAadharImage(null);
     setValidationError(null);
   };
-
-  // Check if the user is already verified
   useEffect(() => {
     const checkExistingVerification = () => {
       const isVerified = localStorage.getItem("zkp_verified");
       const timestamp = localStorage.getItem("zkp_timestamp");
-
-      // If verified and timestamp is recent (within 24 hours)
       if (isVerified === "true" && timestamp) {
         const verifiedTime = parseInt(timestamp);
         const currentTime = Date.now();
         const hoursDiff = (currentTime - verifiedTime) / (1000 * 60 * 60);
 
         if (hoursDiff < 24) {
-          // Show already verified message
           setVerificationResult({
             success: true,
             message:
@@ -288,8 +246,6 @@ export default function ZkpVerification() {
 
     checkExistingVerification();
   }, []);
-
-  // ... [rest of the component remains the same] ...
   return (
     <div className="max-w-5xl mx-auto">
       {/* Title and description */}

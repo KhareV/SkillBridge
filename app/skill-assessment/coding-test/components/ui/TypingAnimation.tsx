@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 interface TypingAnimationProps {
   text: string;
-  speed?: number; // milliseconds per character
+  speed?: number;
   className?: string;
 }
 
@@ -18,13 +18,9 @@ export function TypingAnimation({
 
   useEffect(() => {
     if (!text) return;
-
-    // Reset animation when text changes
     setDisplayedText("");
     setCurrentIndex(0);
     setIsDone(false);
-
-    // Start typing animation
     const timer = setInterval(() => {
       if (currentIndex < text.length) {
         setDisplayedText((prevText) => prevText + text[currentIndex]);

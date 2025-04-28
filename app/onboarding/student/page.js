@@ -21,12 +21,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Layout from "../../components/layout/Layout";
-
-// Current user information
 const currentTime = "2025-04-11 13:58:14";
 const currentUser = "vkhare2909";
-
-// Define steps
 const steps = [
   "Personal Details",
   "Educational Background",
@@ -46,21 +42,17 @@ export default function StudentOnboardingPage() {
     yearOfStudy: "",
     skills: [],
     interests: [],
-    role: "student", // Add role field
+    role: "student",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
-
-  // Redirect if not signed in
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
-
-  // Pre-fill form with user data if available
   useEffect(() => {
     if (isLoaded && user) {
       setFormData((prev) => ({
@@ -70,16 +62,12 @@ export default function StudentOnboardingPage() {
       }));
     }
   }, [isLoaded, user]);
-
-  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    // Clear error when field is updated
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -88,8 +76,6 @@ export default function StudentOnboardingPage() {
       });
     }
   };
-
-  // Handle skills change
   const handleSkillsChange = (skill, action) => {
     if (action === "add" && !formData.skills.includes(skill)) {
       setFormData((prev) => ({
@@ -103,8 +89,6 @@ export default function StudentOnboardingPage() {
       }));
     }
   };
-
-  // Handle interests change
   const handleInterestsChange = (interest, action) => {
     if (action === "add" && !formData.interests.includes(interest)) {
       setFormData((prev) => ({
@@ -118,14 +102,10 @@ export default function StudentOnboardingPage() {
       }));
     }
   };
-
-  // Handle next step
   const handleNextStep = () => {
-    // Validate current step
     const currentErrors = {};
 
     if (currentStep === 0) {
-      // Validate personal details
       if (!formData.name) {
         currentErrors.name = "Name is required";
       }
@@ -135,7 +115,6 @@ export default function StudentOnboardingPage() {
         currentErrors.email = "Email is invalid";
       }
     } else if (currentStep === 1) {
-      // Validate educational background
       if (!formData.institution) {
         currentErrors.institution = "Institution is required";
       }
@@ -146,7 +125,6 @@ export default function StudentOnboardingPage() {
         currentErrors.yearOfStudy = "Year of study is required";
       }
     } else if (currentStep === 2) {
-      // Validate skills & interests
       if (formData.skills.length === 0) {
         currentErrors.skills = "Please select at least one skill";
       }
@@ -156,29 +134,22 @@ export default function StudentOnboardingPage() {
       setErrors(currentErrors);
       return;
     }
-
-    // Go to next step
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       handleSubmit();
     }
   };
-
-  // Handle previous step
   const handlePrevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
-
-  // Handle form submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setApiError(null);
 
     try {
-      // Make API call to save onboarding data
       const response = await fetch("/api/onboarding", {
         method: "POST",
         headers: {
@@ -192,11 +163,7 @@ export default function StudentOnboardingPage() {
       if (!response.ok) {
         throw new Error(data.message || "Failed to save onboarding data");
       }
-
-      // Show success message
       toast.success("Onboarding completed successfully!");
-
-      // Redirect to dashboard
       setTimeout(() => {
         router.push("/dashboard");
       }, 1000);
@@ -208,8 +175,6 @@ export default function StudentOnboardingPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Sample skill options
   const skillOptions = [
     "JavaScript",
     "Python",
@@ -226,8 +191,6 @@ export default function StudentOnboardingPage() {
     "DevOps",
     "Blockchain",
   ];
-
-  // Sample interest options
   const interestOptions = [
     "Web Development",
     "AI & Machine Learning",
@@ -244,8 +207,6 @@ export default function StudentOnboardingPage() {
     "Entrepreneurship",
     "Open Source",
   ];
-
-  // Sample year of study options
   const yearOptions = [
     "First Year",
     "Second Year",

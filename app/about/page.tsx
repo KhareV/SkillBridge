@@ -32,8 +32,6 @@ const AboutUs = () => {
   const isTeamInView = useInView(teamSectionRef);
   const [trailKey, setTrailKey] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  // Loading effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -41,12 +39,8 @@ const AboutUs = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Marquee effect - Fixed implementation
   useEffect(() => {
     if (!marqueeRef.current) return;
-
-    // Create a proper clone for the marquee effect
     const createMarquee = () => {
       const originalContent = marqueeRef.current!.innerHTML;
       marqueeRef.current!.innerHTML = originalContent + originalContent;
@@ -68,8 +62,6 @@ const AboutUs = () => {
       const animationId = requestAnimationFrame(scroll);
       return animationId;
     };
-
-    // Small delay to ensure content is properly rendered
     const timeout = setTimeout(() => {
       const animationId = createMarquee();
       return () => {
@@ -79,8 +71,6 @@ const AboutUs = () => {
 
     return () => clearTimeout(timeout);
   }, [loading]);
-
-  // Force rerender of ImageTrail on view
   useEffect(() => {
     if (isTeamInView) {
       setTrailKey((prevKey) => prevKey + 1);
@@ -90,8 +80,6 @@ const AboutUs = () => {
   const handleAnimationComplete = () => {
     console.log("Animation completed!");
   };
-
-  // Team members data with high-quality images
   const teamMembers = [
     {
       name: "Vedant Khare",
@@ -143,14 +131,10 @@ const AboutUs = () => {
       },
     },
   ];
-
-  // Gallery items for CircularGallery
   const galleryItems = teamMembers.map((member) => ({
     image: member.image,
     text: member.name,
   }));
-
-  // Updated menu items with high-quality images
   const menuItems = [
     {
       link: "#mission",
@@ -177,8 +161,6 @@ const AboutUs = () => {
         "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2000&auto=format&fit=crop",
     },
   ];
-
-  // High-quality images for ImageTrail
   const trailImages = [
     "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=300&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=300&auto=format&fit=crop",
@@ -189,8 +171,6 @@ const AboutUs = () => {
     "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=300&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=300&auto=format&fit=crop",
   ];
-
-  // Values data with icons
   const values = [
     {
       title: "Innovation",
@@ -235,8 +215,6 @@ const AboutUs = () => {
       color: "indigo",
     },
   ];
-
-  // Custom marquee component to ensure proper functioning - not used, so commented out
   /* const Marquee = ({
    *   children,
    *   className,
@@ -262,12 +240,12 @@ const AboutUs = () => {
    *     setContainerWidth(containerRect.width);
    *     setContentWidth(contentRect.width);
    *
-   *     // Clone content to create seamless loop
+   *
    *     const clonedContent = content.cloneNode(true);
    *     container.appendChild(clonedContent);
    *
-   *     // Calculate animation duration based on content width
-   *     const speed = 40; // pixels per second
+   *
+   *     const speed = 40;
    *     const duration = contentRect.width / speed;
    *
    *     container.style.setProperty("--duration", `${duration}s`);

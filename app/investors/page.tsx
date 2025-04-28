@@ -33,8 +33,6 @@ import InvestorCard from "./components/InvestorCard";
 import SearchFilters from "./components/SearchFilters";
 import CallToAction from "./components/CallToAction";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch
 const fetchInvestors = async () => {
   try {
     return [
@@ -216,8 +214,6 @@ export default function InvestorsPage() {
   const [fundingModelFilter, setFundingModelFilter] = useState<string | null>(
     null
   );
-
-  // Current user info
   const currentTime = "2025-03-28 06:57:23";
   const currentUser = "vkhare2909";
 
@@ -233,14 +229,9 @@ export default function InvestorsPage() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -261,7 +252,6 @@ export default function InvestorsPage() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter investors based on search query and filters
     if (investors.length > 0) {
       let filtered = [...investors];
 
@@ -297,8 +287,6 @@ export default function InvestorsPage() {
       setFilteredInvestors(filtered);
     }
   }, [searchQuery, focusFilter, fundingModelFilter, investors]);
-
-  // Get all unique focus areas and funding models from investors
   const allFocusAreas = [
     ...new Set(investors.flatMap((investor) => investor.focusAreas)),
   ].sort();

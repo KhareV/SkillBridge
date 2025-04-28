@@ -40,17 +40,13 @@ import { InvestmentMap } from "@/components/visualizations/investment-map";
 import { formatCurrency } from "@/lib/utils";
 import Layout from "@/app/components/layout/Layout";
 import LoadingScreen from "@/app/funding/apply/components/LoadingScreen";
-
-// Current time and user - exact values as requested
 const currentTime = "2025-04-05 18:00:25";
 const currentUser = "vkhare2909";
-
-// Mock data fetch - would be replaced with real API calls
 const fetchInvestorData = async () => {
   try {
     const response = await fetch("/data/investors.json");
     const investors = await response.json();
-    return investors[0]; // Return the first investor for demo purposes
+    return investors[0];
   } catch (error) {
     console.error("Error fetching investor data:", error);
     return null;
@@ -61,7 +57,7 @@ const fetchStudentData = async () => {
   try {
     const response = await fetch("/data/students.json");
     const students = await response.json();
-    return students; // Return all students
+    return students;
   } catch (error) {
     console.error("Error fetching student data:", error);
     return [];
@@ -98,7 +94,6 @@ export default function InvestorDashboard() {
   }, []);
 
   useEffect(() => {
-    // Filter students based on search and filters
     if (students.length > 0) {
       let filtered = [...students];
 
@@ -136,8 +131,6 @@ export default function InvestorDashboard() {
       setFilteredStudents(filtered);
     }
   }, [searchQuery, selectedField, selectedSkill, minCreditScore, students]);
-
-  // Statistics animation with GSAP
   useEffect(() => {
     if (!loading && statsRef.current) {
       const statValues = statsRef.current.querySelectorAll(".stat-value");
@@ -154,10 +147,8 @@ export default function InvestorDashboard() {
           snap: { textContent: 1 },
           stagger: 0.2,
           onUpdate: function () {
-            // Format numbers with commas
             statValues.forEach((stat) => {
               const value = parseInt(stat.textContent || "0");
-              // @ts-ignore - textContent exists on HTMLElement
               stat.textContent = value.toLocaleString();
             });
           },
@@ -169,8 +160,6 @@ export default function InvestorDashboard() {
   if (loading) {
     return <LoadingScreen />;
   }
-
-  // Calculate metrics
   const totalInvested = investor.totalInvested;
   const activeInvestments = investor.activeInvestments;
   const averageROI = investor.averageROI;

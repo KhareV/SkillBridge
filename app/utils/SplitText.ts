@@ -3,8 +3,6 @@ export class SplitText {
   public chars: HTMLElement[] = [];
   public words: HTMLElement[] = [];
   public lines: HTMLElement[] = [];
-
-  // Current user data
   private currentDateTime = "2025-03-03 19:39:58";
   private currentUser = "vkhare2909";
 
@@ -16,8 +14,6 @@ export class SplitText {
   private split(): void {
     const text = this.element.textContent || "";
     const textArray = text.split(" ");
-
-    // Clear original content
     this.element.textContent = "";
 
     if (
@@ -46,7 +42,6 @@ export class SplitText {
     }
 
     if (this.options.type.includes("lines")) {
-      // We need to wait for the browser to calculate layout
       setTimeout(() => {
         this.calculateLines();
       }, 100);
@@ -74,13 +69,10 @@ export class SplitText {
       if (index === 0 || wordTop === currentTop) {
         currentLine.push(word);
       } else {
-        // New line detected
         this.wrapLineElements(currentLine);
         currentLine = [word];
         currentTop = wordTop;
       }
-
-      // Handle the last line
       if (index === this.words.length - 1) {
         this.wrapLineElements(currentLine);
       }

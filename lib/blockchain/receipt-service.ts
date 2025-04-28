@@ -76,7 +76,6 @@ export async function getTransactionReceiptFromHash(
   amount: string,
   amountUsd: string
 ): Promise<TransactionReceiptData> {
-  // Simulation delay to mimic blockchain request
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   return {
@@ -84,7 +83,7 @@ export async function getTransactionReceiptFromHash(
     fromAddress:
       (window.ethereum as any)?.selectedAddress ||
       "0x0000000000000000000000000000000000000000",
-    toAddress: "0x39DA4702c2A318BC030ff1A732D5fC66c7a8F010", // SkillBridge donation address
+    toAddress: "0x39DA4702c2A318BC030ff1A732D5fC66c7a8F010",
     amount,
     amountUsd,
     gasUsed: "21000",

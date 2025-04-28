@@ -55,17 +55,13 @@ import { CareerMap } from "@/components/visualizations/career-map";
 import { formatCurrency } from "@/lib/utils";
 import Layout from "@/app/components/layout/Layout";
 import LoadingScreen from "@/app/funding/apply/components/LoadingScreen";
-
-// Current time and user - exact values as requested
 const currentTime = "2025-04-05 23:15:20";
 const currentUser = "vkhare2909";
-
-// Mock data fetch - would be replaced with real API calls
 const fetchStudentData = async () => {
   try {
     const response = await fetch("/data/students.json");
     const students = await response.json();
-    return students[0]; // Return the first student for demo purposes
+    return students[0];
   } catch (error) {
     console.error("Error fetching student data:", error);
     return null;
@@ -76,7 +72,7 @@ const fetchCoursesData = async () => {
   try {
     const response = await fetch("/data/courses.json");
     const courses = await response.json();
-    return courses; // Return all courses
+    return courses;
   } catch (error) {
     console.error("Error fetching courses data:", error);
     return [];
@@ -109,7 +105,6 @@ export default function StudentDashboard() {
   }, []);
 
   useEffect(() => {
-    // Filter courses based on search and filters
     if (courses.length > 0) {
       let filtered = [...courses];
 
@@ -141,8 +136,6 @@ export default function StudentDashboard() {
       setFilteredCourses(filtered);
     }
   }, [searchQuery, selectedCategory, selectedSkill, courses]);
-
-  // Statistics animation with GSAP
   useEffect(() => {
     if (!loading && statsRef.current) {
       const statValues = statsRef.current.querySelectorAll(".stat-value");
@@ -159,11 +152,9 @@ export default function StudentDashboard() {
           snap: { textContent: 1 },
           stagger: 0.2,
           onUpdate: function () {
-            // Format numbers with commas
             statValues.forEach((stat) => {
               const value = parseInt(stat.textContent || "0");
               const format = stat.getAttribute("data-format");
-              // @ts-ignore - textContent exists on HTMLElement
               if (format === "currency") {
                 stat.textContent = formatCurrency(value);
               } else {
@@ -179,22 +170,15 @@ export default function StudentDashboard() {
   if (loading) {
     return <LoadingSpinner />;
   }
-
-  // Calculate metrics
   const creditScore = student.educationCreditScore;
-  const completedCourses = student?.completedCourses || 0; // Add safe access
-  const totalFunding = student?.funding?.received || 0; // Add safe access
-  // Add optional chaining and default empty array for milestones
+  const completedCourses = student?.completedCourses || 0;
+  const totalFunding = student?.funding?.received || 0;
   const remainingMilestones = (student?.funding?.milestones ?? []).filter(
     (m: any) => !m.completed
   ).length;
-
-  // Course categories
   const courseCategories = Array.from(
     new Set(courses.map((course) => course.category))
   );
-
-  // Student skills
   const studentSkills = student.skills.map((skill: any) => skill.name);
 
   return (
@@ -723,10 +707,7 @@ export default function StudentDashboard() {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(student?.currentCourses ?? []).map(
-                  (
-                    course: any,
-                    index: number // Added safe access
-                  ) => (
+                  (course: any, index: number) => (
                     <motion.div
                       key={course.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -886,12 +867,10 @@ export default function StudentDashboard() {
                   </Button>
                 </div>
               </div>
-              // Update the line 993 that's causing the error with proper null
               checking:
               {/* Learning Path Section */}
               <div className="p-6 space-y-4">
                 {student?.learningPath ? (
-                  // If learningPath exists, map through it
                   student.learningPath.map((item: any, index: number) => (
                     <div
                       key={index}
@@ -982,7 +961,6 @@ export default function StudentDashboard() {
                     </div>
                   ))
                 ) : (
-                  // If learningPath doesn't exist, show a placeholder
                   <div className="bg-slate-800/50 rounded-xl p-6 text-center border border-slate-700/50">
                     <div className="p-3 bg-slate-800/80 rounded-full mx-auto w-16 h-16 flex items-center justify-center mb-4">
                       <ListChecks className="h-8 w-8 text-slate-500" />
@@ -1244,8 +1222,6 @@ export default function StudentDashboard() {
     </Layout>
   );
 }
-
-// Helper functions for icons and colors
 function getSkillIcon(skillName: string, size: number): React.ReactNode {
   const skillIcons: Record<string, LucideIcon> = {
     "Machine Learning": Brain,
@@ -1259,8 +1235,6 @@ function getSkillIcon(skillName: string, size: number): React.ReactNode {
     DevOps: Terminal,
     "Mobile Development": Smartphone,
   };
-
-  // Return the corresponding icon or a default icon
   const Icon = skillIcons[skillName] || FileText;
   return <Icon size={size} />;
 }

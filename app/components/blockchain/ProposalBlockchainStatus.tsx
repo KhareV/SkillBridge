@@ -38,7 +38,6 @@ export default function ProposalBlockchainStatus({
             const data = await response.json();
             setBlockchainDetails(data);
           } else {
-            // Handle 404 or other errors
             setError("No blockchain connection found for this student");
           }
         } else {

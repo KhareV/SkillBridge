@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  // useSpring, // unused import
-  useInView,
-} from "framer-motion";
-// import Image from "next/image"; // unused import
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { FaLinkedinIn, FaGithub, FaTwitter, FaEnvelope } from "react-icons/fa";
 import Footer from "../components/layout/Footer";
 import Layout from "../components/layout/Layout";
@@ -37,10 +30,6 @@ const AboutSection = () => {
     [0, 0.2, 0.8, 1],
     [1, 0.8, 0.8, 0]
   );
-  // const smoothProgress = useSpring(scrollYProgress, { // unused variable
-  //   damping: 20,
-  //   stiffness: 100,
-  // });
 
   const skillItems = [
     { name: "Frontend Development", level: 90, icon: "🔷" },
@@ -88,8 +77,6 @@ const AboutSection = () => {
     else if (isJourneyInView) setActiveSection("journey");
     else if (isContactInView) setActiveSection("contact");
   }, [isIntroInView, isSkillsInView, isJourneyInView, isContactInView]);
-
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

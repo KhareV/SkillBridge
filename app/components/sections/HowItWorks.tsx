@@ -9,8 +9,6 @@ export default function HowItWorks() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
-  // User data
-
   useEffect(() => {
     if (!timelineRef.current) return;
 
@@ -22,15 +20,11 @@ export default function HowItWorks() {
         scrub: 1,
       },
     });
-
-    // Animate the progress line
     timeline.to(".timeline-progress", {
       height: "100%",
       duration: 1,
       ease: "none",
     });
-
-    // Animate each step as it comes into view
     const steps = gsap.utils.toArray(".timeline-step");
     steps.forEach((step, i) => {
       gsap.to(step as Element, {

@@ -1,8 +1,6 @@
 import mongoose, { Schema, Document, models, Model } from "mongoose";
-
-// Interface defining the structure of a Proposal document
 export interface IProposal extends Document {
-  userId?: Schema.Types.ObjectId; // Reference to the User who submitted the proposal - Made optional
+  userId?: Schema.Types.ObjectId;
   personalInfo: {
     firstName: string;
     lastName: string;
@@ -12,7 +10,7 @@ export interface IProposal extends Document {
   };
   fundingGoals: {
     amountRequested: number;
-    purpose: string; // e.g., Tuition Fees, Living Expenses, Course Materials
+    purpose: string;
     courseName: string;
     institutionName: string;
     studyDurationMonths?: number;
@@ -20,22 +18,20 @@ export interface IProposal extends Document {
   financialInfo?: {
     annualIncome?: number;
     hasCollateral?: boolean;
-    creditScore?: number; // Could be fetched or calculated separately
+    creditScore?: number;
   };
-  essayOrStatement?: string; // Personal statement or essay
+  essayOrStatement?: string;
   supportingDocuments?: {
-    documentType: string; // e.g., ID Proof, Admission Letter, Income Statement
-    url: string; // URL to the uploaded document
+    documentType: string;
+    url: string;
   }[];
-  status: "submitted" | "under_review" | "approved" | "rejected" | "withdrawn"; // Original statuses
+  status: "submitted" | "under_review" | "approved" | "rejected" | "withdrawn";
   submittedAt: Date;
   updatedAt: Date;
 }
-
-// Mongoose Schema for Proposal
 const ProposalSchema: Schema<IProposal> = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User" }, // Was optional
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
     personalInfo: {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
@@ -64,18 +60,15 @@ const ProposalSchema: Schema<IProposal> = new Schema(
     ],
     status: {
       type: String,
-      enum: ["submitted", "under_review", "approved", "rejected", "withdrawn"], // Original statuses
+      enum: ["submitted", "under_review", "approved", "rejected", "withdrawn"],
       default: "submitted",
     },
-    // submittedAt and updatedAt handled by timestamps
   },
   {
     timestamps: { createdAt: "submittedAt", updatedAt: "updatedAt" },
     collection: "proposal-student",
   }
 );
-
-// Force delete the cached model in development
 if (process.env.NODE_ENV === "development" && mongoose.models.Proposal) {
   delete mongoose.models.Proposal;
   console.log("Deleted cached Proposal model in development.");

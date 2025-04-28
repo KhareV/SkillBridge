@@ -1,6 +1,4 @@
 import mongoose, { Schema, Document, models } from "mongoose";
-
-// Define interfaces for nested objects
 interface PersonalInfo {
   name: string;
   email: string;
@@ -12,14 +10,14 @@ interface Education {
   currentLevel: string;
   institution: string;
   major: string;
-  graduationDate: string; // Consider using Date type if precise date is needed
+  graduationDate: string;
   skills: string[];
 }
 
 interface Funding {
   amount: number;
   timeline: string;
-  preferredModel: string; // e.g., ISA, Loan
+  preferredModel: string;
   purpose: string;
 }
 
@@ -32,15 +30,13 @@ interface Career {
 }
 
 interface Documents {
-  resume: string; // Store filename or URL
-  transcript: string; // Store filename or URL
+  resume: string;
+  transcript: string;
   portfolioLink?: string;
   additionalLinks: string[];
 }
-
-// Define the main document interface
 export interface IFundingRequest extends Document {
-  userId: Schema.Types.ObjectId; // Link to the user submitting the request
+  userId: Schema.Types.ObjectId;
   personalInfo: PersonalInfo;
   education: Education;
   funding: Funding;
@@ -50,8 +46,6 @@ export interface IFundingRequest extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
-// Define the schema
 const FundingRequestSchema: Schema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -65,7 +59,7 @@ const FundingRequestSchema: Schema = new Schema(
       currentLevel: { type: String, required: true },
       institution: { type: String, required: true },
       major: { type: String, required: true },
-      graduationDate: { type: String, required: true }, // Or Date
+      graduationDate: { type: String, required: true },
       skills: [{ type: String }],
     },
     funding: {
@@ -82,8 +76,8 @@ const FundingRequestSchema: Schema = new Schema(
       salaryExpectations: { type: Number, required: true },
     },
     documents: {
-      resume: { type: String }, // Store filename or URL
-      transcript: { type: String }, // Store filename or URL
+      resume: { type: String },
+      transcript: { type: String },
       portfolioLink: { type: String },
       additionalLinks: [{ type: String }],
     },
@@ -93,10 +87,8 @@ const FundingRequestSchema: Schema = new Schema(
       default: "pending",
     },
   },
-  { timestamps: true } // Adds createdAt and updatedAt automatically
+  { timestamps: true }
 );
-
-// Create and export the model
 const FundingRequest =
   models.FundingRequest ||
   mongoose.model<IFundingRequest>("FundingRequest", FundingRequestSchema);

@@ -22,20 +22,15 @@ import Head from "next/head";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import LoadingSpinner from "../components/ui/LoadingScreen";
 import Layout from "../components/layout/Layout";
-// Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
 );
-
-// Template options for resume
 const RESUME_TEMPLATES = [
   { id: "modern", name: "Modern Professional", color: "blue" },
   { id: "classic", name: "Classic Elegant", color: "purple" },
   { id: "creative", name: "Creative Bold", color: "emerald" },
   { id: "minimal", name: "Minimal Clean", color: "gray" },
 ];
-
-// Sample job titles for autocomplete
 const JOB_TITLES = [
   "Software Engineer",
   "Frontend Developer",
@@ -111,7 +106,6 @@ type AIFeedback = {
 };
 
 const ResumeBuilder = () => {
-  // Main resume data
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       name: "",
@@ -150,8 +144,6 @@ const ResumeBuilder = () => {
     template: "modern",
     color: "blue",
   });
-
-  // UI state
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [sections, setSections] = useState<ResumeSection[]>([
     {
@@ -205,8 +197,6 @@ const ResumeBuilder = () => {
   const [loading, setLoading] = useState(true);
 
   const previewRef = useRef<HTMLDivElement>(null);
-
-  // Handle section expansion toggle
   const toggleSection = (sectionId: string) => {
     setSections((prev) =>
       prev.map((section) =>
@@ -218,15 +208,12 @@ const ResumeBuilder = () => {
     setActiveSection(sectionId);
   };
   useEffect(() => {
-    // Simulate API data loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Add new work experience entry
   const addWorkExperience = () => {
     setResumeData((prev) => ({
       ...prev,
@@ -245,8 +232,6 @@ const ResumeBuilder = () => {
       ],
     }));
   };
-
-  // Add new education entry
   const addEducation = () => {
     setResumeData((prev) => ({
       ...prev,
@@ -264,16 +249,12 @@ const ResumeBuilder = () => {
       ],
     }));
   };
-
-  // Add new skill
   const addSkill = () => {
     setResumeData((prev) => ({
       ...prev,
       skills: [...prev.skills, ""],
     }));
   };
-
-  // Handle work experience changes
   const handleWorkExperienceChange = (
     index: number,
     field: keyof WorkExperience,
@@ -290,8 +271,6 @@ const ResumeBuilder = () => {
       workExperience: updatedExperience,
     }));
   };
-
-  // Handle education changes
   const handleEducationChange = (
     index: number,
     field: keyof Education,
@@ -308,8 +287,6 @@ const ResumeBuilder = () => {
       education: updatedEducation,
     }));
   };
-
-  // Handle highlight changes
   const handleHighlightChange = (
     experienceIndex: number,
     highlightIndex: number,
@@ -331,8 +308,6 @@ const ResumeBuilder = () => {
       workExperience: updatedExperience,
     }));
   };
-
-  // Add new highlight to a work experience
   const addHighlight = (experienceIndex: number) => {
     const updatedExperience = [...resumeData.workExperience];
     updatedExperience[experienceIndex].highlights.push("");
@@ -342,8 +317,6 @@ const ResumeBuilder = () => {
       workExperience: updatedExperience,
     }));
   };
-
-  // Handle skill changes
   const handleSkillChange = (index: number, value: string) => {
     const updatedSkills = [...resumeData.skills];
     updatedSkills[index] = value;
@@ -353,8 +326,6 @@ const ResumeBuilder = () => {
       skills: updatedSkills,
     }));
   };
-
-  // Handle personal info changes
   const handlePersonalInfoChange = (
     field: keyof typeof resumeData.personalInfo,
     value: string
@@ -367,8 +338,6 @@ const ResumeBuilder = () => {
       },
     }));
   };
-
-  // Remove work experience
   const removeWorkExperience = (index: number) => {
     if (resumeData.workExperience.length === 1) return;
 
@@ -380,8 +349,6 @@ const ResumeBuilder = () => {
       workExperience: updatedExperience,
     }));
   };
-
-  // Remove education
   const removeEducation = (index: number) => {
     if (resumeData.education.length === 1) return;
 
@@ -393,8 +360,6 @@ const ResumeBuilder = () => {
       education: updatedEducation,
     }));
   };
-
-  // Remove highlight
   const removeHighlight = (experienceIndex: number, highlightIndex: number) => {
     if (resumeData.workExperience[experienceIndex].highlights.length === 1)
       return;
@@ -407,8 +372,6 @@ const ResumeBuilder = () => {
       workExperience: updatedExperience,
     }));
   };
-
-  // Remove skill
   const removeSkill = (index: number) => {
     if (resumeData.skills.length === 1) return;
 
@@ -420,9 +383,6 @@ const ResumeBuilder = () => {
       skills: updatedSkills,
     }));
   };
-
-  // Generate AI suggestions for resume improvement
-  // Replace the generateAISuggestions function in your ResumeBuilder component with this improved version
 
   const generateAISuggestions = async () => {
     setIsLoading(true);
@@ -520,32 +480,28 @@ const ResumeBuilder = () => {
         throw new Error("No content returned from Gemini AI.");
       }
 
-      console.error("Raw AI Response:", aiResponseContent); // Keep raw response logging
-
-      // **--- START OF FIX: Remove Markdown Code Block ---**
+      console.error("Raw AI Response:", aiResponseContent);
       let jsonString = aiResponseContent;
 
       if (jsonString.startsWith("```json\n") && jsonString.endsWith("\n```")) {
-        jsonString = jsonString.substring(8, jsonString.length - 4); // Remove ```json\n from start and \n``` from end
+        jsonString = jsonString.substring(8, jsonString.length - 4);
       } else if (
         jsonString.startsWith("```json") &&
         jsonString.endsWith("```")
       ) {
-        jsonString = jsonString.substring(7, jsonString.length - 3); // Remove ```json from start and ``` from end (if no newline after ```json)
+        jsonString = jsonString.substring(7, jsonString.length - 3);
       } else if (
         jsonString.startsWith("```\n") &&
         jsonString.endsWith("\n```")
       ) {
-        jsonString = jsonString.substring(4, jsonString.length - 4); //remove ```\n and \n``` if just ``` without json
+        jsonString = jsonString.substring(4, jsonString.length - 4);
       } else if (jsonString.startsWith("```") && jsonString.endsWith("```")) {
-        jsonString = jsonString.substring(3, jsonString.length - 3); // remove ``` and ``` if just ``` without json and newlines
+        jsonString = jsonString.substring(3, jsonString.length - 3);
       }
-
-      // **--- END OF FIX ---**
 
       let feedbackData;
       try {
-        feedbackData = JSON.parse(jsonString); // Parse the cleaned JSON string
+        feedbackData = JSON.parse(jsonString);
         if (typeof feedbackData !== "object" || feedbackData === null) {
           throw new Error(
             "AI response is not a valid JSON object after Markdown removal."
@@ -580,7 +536,6 @@ const ResumeBuilder = () => {
       setIsLoading(false);
     }
   };
-  // Suggest job titles based on input
   useEffect(() => {
     if (resumeData.targetJobTitle.length > 1) {
       const filtered = JOB_TITLES.filter((title) =>
@@ -591,29 +546,10 @@ const ResumeBuilder = () => {
       setSuggestions([]);
     }
   }, [resumeData.targetJobTitle]);
-
-  // Export resume as PDF
   const exportResume = () => {
     if (!previewRef.current) return;
-
-    // This would typically use a library like jsPDF or html2pdf
-    // For this example, we'll just show an alert
     alert("Resume export functionality would generate a PDF here.");
-
-    // Example implementation with html2pdf:
-    // import html2pdf from 'html2pdf.js';
-    // const element = previewRef.current;
-    // const opt = {
-    //   margin: 1,
-    //   filename: `${resumeData.personalInfo.name.replace(' ', '_')}_Resume.pdf`,
-    //   image: { type: 'jpeg', quality: 0.98 },
-    //   html2canvas: { scale: 2 },
-    //   jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    // };
-    // html2pdf().set(opt).from(element).save();
   };
-
-  // Copy resume content to clipboard
   const copyToClipboard = () => {
     const resumeText = `
 ${resumeData.personalInfo.name}

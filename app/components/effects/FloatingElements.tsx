@@ -18,23 +18,17 @@ const FloatingElements = ({
   maxSize = 60,
   minOpacity = 0.01,
   maxOpacity = 0.05,
-  colors = ["255, 255, 255"], // Default white
+  colors = ["255, 255, 255"],
 }: FloatingElementsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Current user data
   const currentDateTime = "2025-03-03 19:19:43";
   const currentUser = "vkhare2909";
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
-    // Create floating elements
     const elements: HTMLDivElement[] = [];
-
-    // Generate a unique ID for this instance using timestamp and user
     const instanceId = `floating-${currentUser}-${Date.now()}`;
     container.dataset.instance = instanceId;
 
@@ -43,16 +37,12 @@ const FloatingElements = ({
       const size = Math.random() * (maxSize - minSize) + minSize;
       const colorIndex = Math.floor(Math.random() * colors.length);
       const opacity = Math.random() * (maxOpacity - minOpacity) + minOpacity;
-
-      // Use standard styles
       element.className = "absolute rounded-full";
       element.style.width = `${size}px`;
       element.style.height = `${size}px`;
       element.style.background = `rgba(${colors[colorIndex]}, ${opacity})`;
       element.style.top = `${Math.random() * 100}vh`;
       element.style.left = `${Math.random() * 100}vw`;
-
-      // Add metadata
       element.dataset.user = currentUser;
       element.dataset.timestamp = currentDateTime;
       element.dataset.elementId = `${instanceId}-element-${i}`;
@@ -60,10 +50,7 @@ const FloatingElements = ({
       container.appendChild(element);
       elements.push(element);
     }
-
-    // Animate elements with GSAP
     elements.forEach((element, index) => {
-      // Movement animation
       gsap.to(element, {
         x: `random(-100, 100)`,
         y: `random(-100, 100)`,
@@ -72,15 +59,13 @@ const FloatingElements = ({
         yoyo: true,
         ease: "sine.inOut",
       });
-
-      // Opacity animation
       gsap.to(element, {
         opacity: gsap.utils.random(minOpacity, maxOpacity * 2),
         duration: gsap.utils.random(5, 10),
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
-        delay: index * 0.1, // Stagger start times
+        delay: index * 0.1,
       });
     });
 

@@ -26,8 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import SparkleButton from "@/components/ui/SparkleButton";
 import { formatCurrency } from "@/lib/utils";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch
 const fetchJobs = async () => {
   try {
     return [
@@ -197,8 +195,6 @@ export default function CareersPage() {
     null
   );
   const [filtersVisible, setFiltersVisible] = useState(false);
-
-  // Current user info
   const currentTime = "2025-03-28 06:08:31";
   const currentUser = "vkhare2909";
 
@@ -215,14 +211,9 @@ export default function CareersPage() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -243,7 +234,6 @@ export default function CareersPage() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter jobs based on search query and filters
     if (jobs.length > 0) {
       let filtered = [...jobs];
 
@@ -284,8 +274,6 @@ export default function CareersPage() {
       setFilteredJobs(filtered);
     }
   }, [searchQuery, locationFilter, remoteFilter, salaryFilter, jobs]);
-
-  // Format date to "X days ago"
   const formatPostedDate = (dateString: string) => {
     const posted = new Date(dateString);
     const now = new Date();

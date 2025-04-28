@@ -23,21 +23,15 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import LoadingSpinner from "../components/ui/LoadingScreen";
 import Layout from "../components/layout/Layout";
 import Image from "next/image";
-
-// Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
 );
-
-// Template options for letter
 const LETTER_TEMPLATES = [
   { id: "formal", name: "Formal Academic", color: "blue" },
   { id: "professional", name: "Professional", color: "purple" },
   { id: "detailed", name: "Detailed Technical", color: "emerald" },
   { id: "concise", name: "Concise Standard", color: "gray" },
 ];
-
-// Default mentor information
 const DEFAULT_MENTOR_INFO = {
   name: "Dr. Richard Thompson",
   title: "Professor of Computer Science",
@@ -117,8 +111,6 @@ const RecommendationLetterBuilder = () => {
     template: "formal",
     color: "blue",
   });
-
-  // UI state
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [sections, setSections] = useState<LetterSection[]>([
     {
@@ -175,8 +167,6 @@ const RecommendationLetterBuilder = () => {
     month: "long",
     day: "numeric",
   });
-
-  // Toggle section expansion
   const toggleSection = (sectionId: string) => {
     setSections((prev) =>
       prev.map((section) =>
@@ -189,28 +179,20 @@ const RecommendationLetterBuilder = () => {
   };
 
   useEffect(() => {
-    // Simulate API data loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Auto-generate letter when moving to step 2
   useEffect(() => {
     if (currentStep === 2) {
       generateAILetter();
     }
   }, [currentStep]);
-
-  // Process the AI letter to remove signature block
   useEffect(() => {
     if (aiLetter) {
-      // Remove any signature block from the AI-generated letter
       let processed = aiLetter;
-
-      // Find common signature markers and remove everything after them
       const signatureMarkers = [
         "Sincerely,",
         "Yours sincerely,",
@@ -225,8 +207,6 @@ const RecommendationLetterBuilder = () => {
           break;
         }
       }
-
-      // Replace any remaining placeholders with actual mentor info
       processed = processed
         .replace(/\[Your Name\]/g, letterData.mentorInfo.name)
         .replace(/\[Your Title\]/g, letterData.mentorInfo.title)
@@ -240,8 +220,6 @@ const RecommendationLetterBuilder = () => {
       setProcessedLetter(processed);
     }
   }, [aiLetter, letterData.mentorInfo, currentDate]);
-
-  // Handle mentor info changes
   const handleMentorInfoChange = (field: keyof MentorInfo, value: string) => {
     setLetterData((prev) => ({
       ...prev,
@@ -251,8 +229,6 @@ const RecommendationLetterBuilder = () => {
       },
     }));
   };
-
-  // Handle student info changes
   const handleStudentInfoChange = (field: keyof StudentInfo, value: string) => {
     setLetterData((prev) => ({
       ...prev,
@@ -262,8 +238,6 @@ const RecommendationLetterBuilder = () => {
       },
     }));
   };
-
-  // Handle skills and achievements
   const handleSkillChange = (index: number, value: string) => {
     const updatedSkills = [...letterData.skillsAndAchievements.skills];
     updatedSkills[index] = value;
@@ -304,8 +278,6 @@ const RecommendationLetterBuilder = () => {
       },
     }));
   };
-
-  // Handle personal traits
   const handleTraitChange = (index: number, value: string) => {
     const updatedTraits = [...letterData.personalTraits.traits];
     updatedTraits[index] = value;
@@ -331,8 +303,6 @@ const RecommendationLetterBuilder = () => {
       },
     }));
   };
-
-  // Add/remove functions
   const addSkill = () => {
     setLetterData((prev) => ({
       ...prev,
@@ -459,8 +429,6 @@ const RecommendationLetterBuilder = () => {
       },
     }));
   };
-
-  // Generate AI letter
   const generateAILetter = async () => {
     setIsLoading(true);
     setAiLetter(null);
@@ -581,18 +549,12 @@ The tone should be formal, enthusiastic, and supportive. Use professional langua
       setIsLoading(false);
     }
   };
-
-  // Export letter as PDF
   const exportLetter = () => {
     if (!previewRef.current) return;
     alert("Letter export functionality would generate a PDF here.");
   };
-
-  // Copy letter to clipboard
   const copyToClipboard = () => {
     if (!processedLetter) return;
-
-    // Get the full letter including the signature
     const signatureBlock = `
 Sincerely,
 

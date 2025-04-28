@@ -13,8 +13,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Layout from "../../../components/layout/Layout";
-
-// Mock data for discussion and comments
 const fetchDiscussionData = (id: string) => {
   const discussions = [
     {
@@ -33,7 +31,6 @@ const fetchDiscussionData = (id: string) => {
       views: 356,
       createdAt: "2025-03-24T10:15:00Z",
     },
-    // Other discussions would be here...
   ];
 
   const comments = [
@@ -135,8 +132,6 @@ const fetchDiscussionData = (id: string) => {
     comments,
   };
 };
-
-// Format date to "X days ago"
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -186,13 +181,9 @@ export default function DiscussionPage({ params }: { params: { id: string } }) {
     setCommentReactions((prev) => {
       const current = { ...prev[commentId] };
       const currentUserReaction = userReactions[commentId];
-
-      // Remove previous reaction if any
       if (currentUserReaction) {
         current[currentUserReaction === "like" ? "likes" : "dislikes"] -= 1;
       }
-
-      // Add new reaction if different from current
       if (currentUserReaction !== reaction) {
         current[reaction === "like" ? "likes" : "dislikes"] += 1;
       }
@@ -210,7 +201,6 @@ export default function DiscussionPage({ params }: { params: { id: string } }) {
     navigator.clipboard.writeText(
       `${window.location.origin}/community/discussions/${discussion.id}`
     );
-    // Would add toast notification in a real implementation
   };
 
   return (

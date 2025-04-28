@@ -17,7 +17,6 @@ export default function Layout({
   userLogin = "vkhare2909",
 }: LayoutProps) {
   useEffect(() => {
-    // Update the date time every minute
     const timer = setInterval(() => {}, 60000);
 
     return () => clearInterval(timer);

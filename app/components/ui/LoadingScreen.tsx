@@ -9,12 +9,9 @@ const LoadingScreen = () => {
   const logoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Activate hyperspeed effect shortly after component mounts
     const hyperspeedTimer = setTimeout(() => {
       setHyperspeedActive(true);
     }, 300);
-
-    // Set timer to remove loading screen
     const loadingTimer = setTimeout(() => {
       setLoading(false);
     }, 3000);

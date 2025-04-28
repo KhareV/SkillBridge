@@ -1,26 +1,17 @@
 const fs = require("fs");
 const path = require("path");
-
-// Paths
 const sourceDir = path.join(__dirname, "node_modules/three-globe/example/img");
 const targetDir = path.join(__dirname, "public/textures");
-
-// Create target directory if it doesn't exist
 if (!fs.existsSync(targetDir)) {
   fs.mkdirSync(targetDir, { recursive: true });
 }
-
-// Files to copy from three-globe package
 const files = [
-  // Copy the blue marble earth as both original and daylight version
   { source: "earth-blue-marble.jpg", target: "earth-blue-marble.jpg" },
   { source: "earth-blue-marble.jpg", target: "earth-daylight.jpg" },
   { source: "earth-night.jpg", target: "earth-night.jpg" },
   { source: "earth-topology.png", target: "earth-topology.png" },
   { source: "earth-water.png", target: "earth-water.png" },
 ];
-
-// Copy each file from three-globe
 files.forEach((file) => {
   try {
     const sourceFile = path.join(sourceDir, file.source);
@@ -36,8 +27,6 @@ files.forEach((file) => {
     console.error(`Error copying ${file.source}: ${error.message}`);
   }
 });
-
-// Additional textures - check if they exist in another location
 const additionalFiles = [
   {
     name: "earth-clouds.png",

@@ -85,9 +85,7 @@ export function LearningPathTimeline({
       .append("g")
       .attr("class", "node")
       .attr("transform", (d) => `translate(${xScale(d.date)}, 0)`)
-      .style("opacity", 0); // Start invisible
-
-    // Node circles
+      .style("opacity", 0);
     nodeGroups
       .append("circle")
       .attr("r", 8)
@@ -163,8 +161,6 @@ export function LearningPathTimeline({
       .text((d) => d.date.toLocaleDateString())
       .attr("fill", "var(--muted-foreground)")
       .attr("font-size", 10);
-
-    // Type indicators
     nodeGroups
       .append("text")
       .attr("text-anchor", "middle")
@@ -184,8 +180,6 @@ export function LearningPathTimeline({
       .attr("fill", "white")
       .attr("font-size", 10)
       .attr("font-weight", "bold");
-
-    // Animate nodes appearing
     gsap.fromTo(
       nodeGroups.nodes(),
       { opacity: 0, y: 20 },

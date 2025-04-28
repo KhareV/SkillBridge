@@ -21,8 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch
 const fetchPremiumPlans = async () => {
   try {
     const response = await fetch("/data/premium-plans.json");
@@ -51,8 +49,6 @@ export default function PremiumPage() {
 
     loadData();
   }, []);
-
-  // Animate testimonials
   useEffect(() => {
     if (!loading && testimonialRef.current) {
       gsap.fromTo(
@@ -68,8 +64,6 @@ export default function PremiumPage() {
       );
     }
   }, [loading]);
-
-  // Toggle FAQ items
   const toggleFAQ = (index: number) => {
     if (expandedFAQ === index) {
       setExpandedFAQ(null);
@@ -77,8 +71,6 @@ export default function PremiumPage() {
       setExpandedFAQ(index);
     }
   };
-
-  // Filtered plans based on selected billing cycle
   const filteredPlans = plans.filter(
     (plan) =>
       plan.billingCycle === billingCycle ||

@@ -9,10 +9,6 @@ import {
   FaChevronRight,
   FaUserClock,
 } from "react-icons/fa";
-
-// Current user data
-
-// Testimonial data
 const testimonials = [
   {
     id: 1,

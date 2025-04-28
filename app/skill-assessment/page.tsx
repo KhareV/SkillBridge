@@ -32,8 +32,6 @@ import {
 import useNavigate from "next/navigation";
 import { generateSkillQuestions } from "@/lib/gemini-api";
 import { cn } from "@/lib/utils";
-
-// Mock data fetch - replace with actual API calls later
 const fetchUserSkills = async () => {
   try {
     const response = await fetch("/data/students.json");
@@ -56,7 +54,6 @@ const fetchAvailableSkills = async () => {
 };
 
 export default function SkillAssessment() {
-  // Current user info
   const currentTime = "2025-03-28 07:08:39";
   const currentUser = "vkhare2909";
 
@@ -69,8 +66,6 @@ export default function SkillAssessment() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("my-skills");
-
-  // For assessment flow
   const [assessmentMode, setAssessmentMode] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<any>(null);
   const [assessmentQuestions, setAssessmentQuestions] = useState<any[]>([]);
@@ -96,14 +91,9 @@ export default function SkillAssessment() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -124,7 +114,6 @@ export default function SkillAssessment() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter skills based on search query and category
     if (availableSkills.length > 0) {
       let filtered = [...availableSkills];
 
@@ -158,7 +147,6 @@ export default function SkillAssessment() {
 
     setLoadingQuestions(true);
     try {
-      // Generate questions using Gemini API
       const questions = await generateSkillQuestions(
         skill.name,
         "intermediate"
@@ -166,7 +154,6 @@ export default function SkillAssessment() {
       setAssessmentQuestions(questions);
     } catch (error) {
       console.error("Error generating questions:", error);
-      // Fallback to sample questions if API fails
       setAssessmentQuestions([
         {
           question: `What is a key feature of ${skill.name}?`,
@@ -197,11 +184,8 @@ export default function SkillAssessment() {
   };
 
   const answerQuestion = (optionIndex: number) => {
-    // Store the user's answer
     const updatedAnswers = [...userAnswers, optionIndex];
     setUserAnswers(updatedAnswers);
-
-    // Move to next question or complete assessment
     if (currentQuestionIndex < assessmentQuestions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
@@ -211,8 +195,6 @@ export default function SkillAssessment() {
 
   const completeAssessment = (answers: number[]) => {
     setAssessmentComplete(true);
-
-    // Calculate result (in real implementation, this would use the Gemini API)
     const correctAnswers = answers.filter(
       (answer, index) => answer === assessmentQuestions[index].correctAnswer
     ).length;
@@ -234,16 +216,12 @@ export default function SkillAssessment() {
         </ul>
       `,
     });
-
-    // In a real implementation, we would update the user's skill in the database
     if (score > 0) {
-      // Check if user already has this skill
       const existingSkillIndex = userSkills.findIndex(
         (s) => s.name === selectedSkill.name
       );
 
       if (existingSkillIndex >= 0) {
-        // Update existing skill
         const updatedSkills = [...userSkills];
         updatedSkills[existingSkillIndex] = {
           ...updatedSkills[existingSkillIndex],
@@ -252,7 +230,6 @@ export default function SkillAssessment() {
         };
         setUserSkills(updatedSkills);
       } else {
-        // Add new skill
         const newSkill = {
           id: `skill-${Date.now()}`,
           name: selectedSkill.name,
@@ -274,8 +251,6 @@ export default function SkillAssessment() {
     setAssessmentComplete(false);
     setAssessmentResult(null);
   };
-
-  // Get unique categories from available skills
   const categories = [
     ...new Set(availableSkills.map((skill) => skill.category)),
   ];
@@ -317,8 +292,6 @@ export default function SkillAssessment() {
       </div>
     );
   }
-
-  // Assessment mode takes over the UI
   if (assessmentMode) {
     return (
       <Layout>
@@ -681,7 +654,6 @@ export default function SkillAssessment() {
                     </h3>
                     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                       {userSkills.map((skill) => {
-                        // Calculate days since verification
                         const lastVerified = new Date(skill.lastVerified);
                         const now = new Date();
                         const daysSince = Math.floor(
@@ -863,7 +835,6 @@ export default function SkillAssessment() {
 
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {filteredSkills.map((skill, index) => {
-                  // Check if user already has this skill
                   const userSkill = userSkills.find(
                     (s) => s.name === skill.name
                   );

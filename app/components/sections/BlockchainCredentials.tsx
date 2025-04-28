@@ -8,8 +8,6 @@ import NFTCard from "../ui/NFTCard";
 
 export default function BlockchainCredentials() {
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  // User data
   const currentDateTime = "2025-03-03 19:09:29";
   const currentUser = "vkhare2909";
 

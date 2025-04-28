@@ -45,8 +45,6 @@ const BlurText: React.FC<BlurTextProps> = ({
     observer.observe(ref.current);
     return () => observer.disconnect();
   }, [threshold, rootMargin]);
-
-  // Handle animation completion
   useEffect(() => {
     if (inView && !animationComplete) {
       const totalAnimationTime = elements.length * delay + duration;

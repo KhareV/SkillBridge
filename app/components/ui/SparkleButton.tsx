@@ -2,8 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-// Current user data
 const currentDateTime = "2025-03-03 19:13:52";
 const currentUser = "vkhare2909";
 

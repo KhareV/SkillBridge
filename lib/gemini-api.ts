@@ -3,8 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-// Create GoogleGenerativeAI client if API key exists
 const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 
 export interface SkillQuestion {
@@ -33,7 +31,6 @@ export async function generateSkillQuestions(
   count: number = 5
 ): Promise<SkillQuestion[]> {
   try {
-    // Fallback to mock questions if no API key
     if (!GEMINI_API_KEY) {
       console.warn("Gemini API key not found, using mock questions");
       return getMockSkillQuestions(skillName, level).slice(0, count);
@@ -51,8 +48,6 @@ export async function generateSkillQuestions(
       
       Return only the JSON array with no additional text.
     `;
-
-    // Try GoogleGenerativeAI SDK first
     if (genAI) {
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       const result = await model.generateContent(prompt);
@@ -62,8 +57,6 @@ export async function generateSkillQuestions(
       if (!jsonMatch) throw new Error("Could not parse JSON from response");
       return JSON.parse(jsonMatch[0]).slice(0, count);
     }
-
-    // Fallback to direct API call
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,13 +100,15 @@ export async function evaluateSkillLevel(
     }
 
     const prompt = `
-      A user scored ${correctCount}/${questions.length
-      } (${percentCorrect}%) on a ${skillName} quiz.
+      A user scored ${correctCount}/${
+      questions.length
+    } (${percentCorrect}%) on a ${skillName} quiz.
       Performance details:
       ${questions
         .map(
           (q, i) =>
-            `Q: "${q.question.substring(0, 50)}...": ${userAnswers[i] === q.correctAnswer ? "Correct" : "Incorrect"
+            `Q: "${q.question.substring(0, 50)}...": ${
+              userAnswers[i] === q.correctAnswer ? "Correct" : "Incorrect"
             }`
         )
         .join("\n")}
@@ -144,7 +139,7 @@ export async function evaluateSkillLevel(
       level: Math.round(
         (userAnswers.filter((a, i) => questions[i].correctAnswer === a).length /
           questions.length) *
-        100
+          100
       ),
       feedback: "Unable to generate detailed feedback. Please try again.",
     };
@@ -220,12 +215,20 @@ export async function generateJobRecommendations(
   skills: Array<{ name: string; level: number }>,
   interests: string[],
   background: string,
-  count: number = 6 // Number of job recommendations to fetch
-): Promise<Array<{ id: number; companyName: string; jobRole: string; salary: string; location: string }>> {
+  count: number = 6
+): Promise<
+  Array<{
+    id: number;
+    companyName: string;
+    jobRole: string;
+    salary: string;
+    location: string;
+  }>
+> {
   try {
     if (!GEMINI_API_KEY) {
       console.warn("Gemini API key not found, using mock job recommendations");
-      return getMockJobRecommendations(count); // Use a mock function if needed
+      return getMockJobRecommendations(count);
     }
 
     const skillsText = skills
@@ -257,13 +260,11 @@ export async function generateJobRecommendations(
       const response = await result.response;
       jsonText = response.text();
     } else {
-      // Fallback to direct API call
       const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          // Adjust generationConfig as needed, maybe higher temperature for more varied jobs?
           generationConfig: { temperature: 0.4, maxOutputTokens: 1500 },
         }),
       });
@@ -273,40 +274,70 @@ export async function generateJobRecommendations(
       }
       jsonText = data.candidates[0].content.parts[0].text.trim();
     }
-
-    // Extract the JSON array from the response text
     const jsonMatch = jsonText.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      console.error("Could not parse JSON array from Gemini response:", jsonText);
+      console.error(
+        "Could not parse JSON array from Gemini response:",
+        jsonText
+      );
       throw new Error("Could not parse JSON array from Gemini response");
     }
-
-    // Parse and return the job recommendations
     const jobs = JSON.parse(jsonMatch[0]);
-    // Ensure IDs are added if Gemini didn't include them (though the prompt asks for it)
-    return jobs.map((job: any, index: number) => ({ ...job, id: job.id || index + 1 })).slice(0, count);
-
+    return jobs
+      .map((job: any, index: number) => ({ ...job, id: job.id || index + 1 }))
+      .slice(0, count);
   } catch (error) {
     console.error("Error generating job recommendations:", error);
-    // Fallback to mock data in case of error
     return getMockJobRecommendations(count);
   }
 }
-
-// Mock function for job recommendations (can be used as fallback)
 function getMockJobRecommendations(count: number) {
   const mockJobs = [
-    { id: 1, companyName: "Google (Mock)", jobRole: "Software Engineer", salary: "$150,000", location: "Mountain View, CA" },
-    { id: 2, companyName: "Microsoft (Mock)", jobRole: "Cloud Solutions Architect", salary: "$165,000", location: "Redmond, WA" },
-    { id: 3, companyName: "Apple (Mock)", jobRole: "iOS Developer", salary: "$155,000", location: "Cupertino, CA" },
-    { id: 4, companyName: "Amazon (Mock)", jobRole: "Data Scientist", salary: "$140,000", location: "Seattle, WA" },
-    { id: 5, companyName: "Meta (Mock)", jobRole: "Machine Learning Engineer", salary: "$170,000", location: "Menlo Park, CA" },
-    { id: 6, companyName: "Netflix (Mock)", jobRole: "Senior Backend Engineer", salary: "$180,000", location: "Los Gatos, CA" },
+    {
+      id: 1,
+      companyName: "Google (Mock)",
+      jobRole: "Software Engineer",
+      salary: "$150,000",
+      location: "Mountain View, CA",
+    },
+    {
+      id: 2,
+      companyName: "Microsoft (Mock)",
+      jobRole: "Cloud Solutions Architect",
+      salary: "$165,000",
+      location: "Redmond, WA",
+    },
+    {
+      id: 3,
+      companyName: "Apple (Mock)",
+      jobRole: "iOS Developer",
+      salary: "$155,000",
+      location: "Cupertino, CA",
+    },
+    {
+      id: 4,
+      companyName: "Amazon (Mock)",
+      jobRole: "Data Scientist",
+      salary: "$140,000",
+      location: "Seattle, WA",
+    },
+    {
+      id: 5,
+      companyName: "Meta (Mock)",
+      jobRole: "Machine Learning Engineer",
+      salary: "$170,000",
+      location: "Menlo Park, CA",
+    },
+    {
+      id: 6,
+      companyName: "Netflix (Mock)",
+      jobRole: "Senior Backend Engineer",
+      salary: "$180,000",
+      location: "Los Gatos, CA",
+    },
   ];
   return mockJobs.slice(0, count);
 }
-
-// Mock data functions remain unchanged
 function getMockSkillQuestions(
   skillName: string,
   level: string
@@ -323,7 +354,6 @@ function getMockSkillQuestions(
       correctAnswer: 1,
       explanation: `${skillName} is widely known for its robust capabilities in data manipulation and analysis.`,
     },
-    // ... (rest of the mock questions remain the same)
   ];
 }
 
@@ -347,7 +377,6 @@ function getMockCareerRecommendations(skills: any[], interests: string[]): any {
           "Learn cloud-based ML deployment",
         ],
       },
-      // ... (rest of the mock recommendations remain the same)
     ],
   };
 

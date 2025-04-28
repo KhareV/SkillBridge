@@ -8,12 +8,8 @@ import { TrendingUp, Map, Clock, Target, BarChart, Users } from "lucide-react";
 export default function CareerVisualization() {
   const [activeTab, setActiveTab] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  // User data and timestamp
   const currentDateTime = "2025-04-04 20:19:49";
   const currentUser = "vkhare2909";
-
-  // Mouse parallax effect for the 3D scene
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 

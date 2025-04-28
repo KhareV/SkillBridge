@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase, getDataOrMock } from "@/lib/db/mongoose";
 import InvestorOnboarding from "@/lib/db/models/investorOnboarding";
-
-// Mock data to use when DB connection fails
 const mockInvestorData = {
   name: "Mock Investor",
   email: "mock.investor@example.com",
@@ -24,8 +22,6 @@ export async function GET(request) {
         { status: 400 }
       );
     }
-
-    // Try to get data from DB, fall back to mock if connection fails
     const onboarding = await getDataOrMock(
       async (options) => {
         await connectToDatabase();
@@ -34,8 +30,6 @@ export async function GET(request) {
       mockInvestorData,
       { $or: [{ clerkId: userId }, { userId: userId }] }
     );
-
-    // If we actually got null from the DB (not mock data)
     if (!onboarding) {
       return NextResponse.json(
         { success: false, message: "Investor onboarding data not found" },
@@ -49,8 +43,6 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("Error in investor onboarding data retrieval:", error);
-
-    // Fall back to mock data in case of errors
     return NextResponse.json({
       success: true,
       onboarding: mockInvestorData,

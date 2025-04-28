@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
 /**
@@ -6,7 +5,6 @@ pragma solidity ^0.8.17;
  * @dev Contract for creating and voting on proposals in SkillBridge
  */
 contract ProposalContract {
-    // Struct for proposal details
     struct Proposal {
         uint256 id;
         string title;
@@ -20,25 +18,17 @@ contract ProposalContract {
         bool rejected;
         mapping(address => bool) hasVoted;
     }
-
-    // State variables
     address public owner;
     uint256 public proposalCount;
     mapping(uint256 => Proposal) public proposals;
-    
-    // Events
     event ProposalCreated(uint256 indexed id, string title, uint256 amount, uint256 deadline);
     event VoteCast(uint256 indexed proposalId, address indexed voter, bool support);
     event ProposalExecuted(uint256 indexed proposalId, uint256 amount);
     event ProposalRejected(uint256 indexed proposalId);
-    
-    // Modifiers
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
     }
-    
-    // Constructor
     constructor() {
         owner = msg.sender;
         proposalCount = 0;

@@ -33,8 +33,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import SparkleButton from "@/components/ui/SparkleButton";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch
 const fetchCommunityData = async () => {
   try {
     return {
@@ -202,8 +200,6 @@ export default function CommunityPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDiscussions, setFilteredDiscussions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("discussions");
-
-  // Current user info
   const currentTime = "2025-03-28 06:13:49";
   const currentUser = "vkhare2909";
 
@@ -219,14 +215,9 @@ export default function CommunityPage() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -247,7 +238,6 @@ export default function CommunityPage() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter discussions based on search query
     if (communityData) {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -266,8 +256,6 @@ export default function CommunityPage() {
       }
     }
   }, [searchQuery, communityData]);
-
-  // Format date to "X days ago"
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -287,8 +275,6 @@ export default function CommunityPage() {
       return `${diffDays} days ago`;
     }
   };
-
-  // Format date to full format
   const formatFullDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {

@@ -10,8 +10,6 @@ import FundingGoalsStep from "./steps/FundingGoalsStep";
 import CareerPlansStep from "./steps/CareerPlansStep";
 import DocumentationStep from "./steps/DocumentationStep";
 import ReviewSubmitStep from "./steps/ReviewSubmitStep";
-
-// Application steps
 const steps = [
   "Personal Information",
   "Education & Skills",
@@ -39,8 +37,6 @@ export default function FormContainer({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formContainerRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to top when changing steps
   useEffect(() => {
     if (formContainerRef.current) {
       formContainerRef.current.scrollTo(0, 0);
@@ -55,8 +51,6 @@ export default function FormContainer({
         [field]: value,
       },
     }));
-
-    // Clear error when field is updated
     if (errors[`${section}.${field}`]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -70,7 +64,6 @@ export default function FormContainer({
     const currentErrors: Record<string, string> = {};
 
     if (currentStep === 0) {
-      // Validate personal info
       if (!formData.personalInfo.name)
         currentErrors["personalInfo.name"] = "Name is required";
       if (!formData.personalInfo.email)
@@ -80,7 +73,6 @@ export default function FormContainer({
       if (!formData.personalInfo.location)
         currentErrors["personalInfo.location"] = "Location is required";
     } else if (currentStep === 1) {
-      // Validate education
       if (!formData.education.institution)
         currentErrors["education.institution"] = "Institution is required";
       if (!formData.education.major)
@@ -89,7 +81,6 @@ export default function FormContainer({
         currentErrors["education.graduationDate"] =
           "Graduation date is required";
     } else if (currentStep === 2) {
-      // Validate funding
       if (!formData.funding.amount)
         currentErrors["funding.amount"] = "Amount is required";
       if (!formData.funding.purpose)
@@ -97,7 +88,6 @@ export default function FormContainer({
       if (!formData.funding.timeline)
         currentErrors["funding.timeline"] = "Timeline is required";
     } else if (currentStep === 3) {
-      // Validate career
       if (!formData.career.shortTermGoals)
         currentErrors["career.shortTermGoals"] =
           "Short-term goals are required";
@@ -112,15 +102,12 @@ export default function FormContainer({
   };
 
   const handleNextStep = () => {
-    // Validate current step
     const currentErrors = validateCurrentStep();
 
     if (Object.keys(currentErrors).length > 0) {
       setErrors(currentErrors);
       return;
     }
-
-    // If validation passes, go to next step
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -136,8 +123,6 @@ export default function FormContainer({
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-
-    // Simulate API call
     setTimeout(() => {
       onSubmit(formData);
       setIsSubmitting(false);

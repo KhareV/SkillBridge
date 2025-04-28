@@ -1,8 +1,6 @@
 /**
  * Service for fetching cryptocurrency prices using free APIs with fallbacks
  */
-
-// Define types for price data
 export interface PriceData {
   price: number;
   change24h?: number;
@@ -20,7 +18,6 @@ export interface ConversionRates {
  * Fetch ETH price from multiple APIs with fallbacks
  */
 export const fetchEthPrice = async (): Promise<PriceData> => {
-  // List of free APIs for crypto prices
   const apiSources = [
     {
       name: "CoinGecko",
@@ -43,17 +40,14 @@ export const fetchEthPrice = async (): Promise<PriceData> => {
       url: "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD",
       parse: (data: any) => ({
         price: data.USD,
-        change24h: 0, // Basic API doesn't include 24h change
+        change24h: 0,
       }),
     },
   ];
-
-  // Try each API in sequence until one works
   for (const api of apiSources) {
     try {
       const response = await fetch(api.url, {
         headers: { Accept: "application/json" },
-        // Don't cache to get fresh data
         cache: "no-store",
       });
 
@@ -72,14 +66,11 @@ export const fetchEthPrice = async (): Promise<PriceData> => {
       };
     } catch (error) {
       console.warn(`${api.name} API failed:`, error);
-      // Continue to next API
     }
   }
-
-  // Fallback to server API if all direct calls fail
   try {
     const response = await fetch("/api/blockchain/eth-price", {
-      cache: "no-store", // Don't cache to get fresh data
+      cache: "no-store",
     });
     const data = await response.json();
 
@@ -92,10 +83,8 @@ export const fetchEthPrice = async (): Promise<PriceData> => {
     };
   } catch (backupError) {
     console.error("All price APIs failed:", backupError);
-
-    // Last resort fallback to a reasonable estimate with timestamp
     return {
-      price: 3150.42, // Fallback price
+      price: 3150.42,
       timestamp: new Date(),
       isEstimate: true,
       source: "Fallback Value",
@@ -107,7 +96,6 @@ export const fetchEthPrice = async (): Promise<PriceData> => {
  * Get USD to INR conversion rate from free APIs
  */
 export const getUsdToInrRate = async (): Promise<number> => {
-  // List of free APIs for currency conversion
   const apiSources = [
     {
       name: "ExchangeRate-API",
@@ -120,8 +108,6 @@ export const getUsdToInrRate = async (): Promise<number> => {
       parse: (data: any) => data.rates?.INR,
     },
   ];
-
-  // Try each API in sequence until one works
   for (const api of apiSources) {
     try {
       const response = await fetch(api.url, {
@@ -143,12 +129,9 @@ export const getUsdToInrRate = async (): Promise<number> => {
       }
     } catch (error) {
       console.warn(`${api.name} API failed:`, error);
-      // Continue to next API
     }
   }
-
-  // Fallback to a reasonable estimate
-  return 83.12; // Fallback USD to INR rate
+  return 83.12;
 };
 
 /**
@@ -156,7 +139,6 @@ export const getUsdToInrRate = async (): Promise<number> => {
  */
 export const getConversionRates = async (): Promise<ConversionRates> => {
   try {
-    // Fetch both rates in parallel
     const [ethData, usdInrRate] = await Promise.all([
       fetchEthPrice(),
       getUsdToInrRate(),
@@ -168,8 +150,6 @@ export const getConversionRates = async (): Promise<ConversionRates> => {
     };
   } catch (error) {
     console.error("Error getting conversion rates:", error);
-
-    // Return fallback rates
     return {
       ETH_USD: 3150.42,
       USD_INR: 83.12,
@@ -188,21 +168,17 @@ export const convertCurrency = async (
   if (from === to) return amount;
 
   const rates = await getConversionRates();
-
-  // Convert from source currency to USD as intermediate step
   let amountInUsd = amount;
   if (from === "ETH") {
     amountInUsd = amount * rates.ETH_USD;
   } else if (from === "INR") {
     amountInUsd = amount / rates.USD_INR;
   }
-
-  // Convert from USD to target currency
   if (to === "ETH") {
     return amountInUsd / rates.ETH_USD;
   } else if (to === "INR") {
     return amountInUsd * rates.USD_INR;
   } else {
-    return amountInUsd; // USD output
+    return amountInUsd;
   }
 };

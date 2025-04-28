@@ -59,20 +59,15 @@ export default function UsdConverter() {
   const [receiptData, setReceiptData] = useState<FormattedReceiptData | null>(
     null
   );
-
-  // Check wallet connection
   const checkWalletConnection = useCallback(async () => {
     if (window.ethereum) {
       try {
-        // Get connected accounts
         const accounts = await window.ethereum.request({
           method: "eth_accounts",
         });
 
         if (accounts.length > 0) {
           setAccount(accounts[0]);
-
-          // Get current chain
           const chainId = await window.ethereum.request({
             method: "eth_chainId",
           });
@@ -83,12 +78,10 @@ export default function UsdConverter() {
       }
     }
   }, []);
-
-  // Fetch ETH price with multiple API sources
   const fetchEthPrice = async () => {
     try {
       const priceData = await fetch("/api/blockchain/eth-price", {
-        cache: "no-store", // No caching to get latest price
+        cache: "no-store",
       });
 
       if (!priceData.ok) {
@@ -98,8 +91,6 @@ export default function UsdConverter() {
       return await priceData.json();
     } catch (error) {
       console.error("Error fetching ETH price:", error);
-
-      // Try direct API call as backup
       try {
         const response = await fetch(
           "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_24hr_change=true"
@@ -114,8 +105,6 @@ export default function UsdConverter() {
         };
       } catch (backupError) {
         console.error("Backup API also failed:", backupError);
-
-        // Fallback to a default value if API fails
         return {
           price: 3150.42,
           change24h: 0,
@@ -126,8 +115,6 @@ export default function UsdConverter() {
       }
     }
   };
-
-  // Fetch ETH price and update history
   const updateEthPrice = async () => {
     setIsRefreshing(true);
     try {
@@ -154,11 +141,7 @@ export default function UsdConverter() {
       });
 
       setLastUpdated(now.toLocaleTimeString());
-
-      // Update the data source info
       setDataSource(priceData.source || "Unknown");
-
-      // Update converted values if they exist
       if (ethAmount)
         handleEthChange({
           target: { value: ethAmount },
@@ -178,8 +161,6 @@ export default function UsdConverter() {
       setIsLoading(false);
     }
   };
-
-  // Update price on component mount
   useEffect(() => {
     const initializeComponent = async () => {
       await checkWalletConnection();
@@ -187,8 +168,6 @@ export default function UsdConverter() {
     };
 
     initializeComponent();
-
-    // Setup listeners for wallet events
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
         setAccount(accounts.length > 0 ? accounts[0] : null);
@@ -200,23 +179,17 @@ export default function UsdConverter() {
     }
 
     return () => {
-      // Cleanup listeners
       if (window.ethereum) {
         window.ethereum.removeAllListeners("accountsChanged");
         window.ethereum.removeAllListeners("chainChanged");
       }
     };
   }, [checkWalletConnection]);
-
-  // Start auto-refresh timer for price updates
   useEffect(() => {
-    // Initial update
     updateEthPrice();
-
-    // Set up periodic refresh (every minute)
     const timer = setInterval(() => {
       updateEthPrice();
-    }, 60000); // 60 seconds
+    }, 60000);
 
     return () => clearInterval(timer);
   }, []);
@@ -269,8 +242,6 @@ export default function UsdConverter() {
       );
     }
   };
-
-  // Send Transaction with proper error handling and gas estimation
   const sendTransaction = async () => {
     if (!account || !ethAmount || parseFloat(ethAmount) <= 0) {
       setTxError("Please connect your wallet and enter a valid amount");
@@ -286,29 +257,19 @@ export default function UsdConverter() {
       if (!window.ethereum) {
         throw new Error("Ethereum provider not found");
       }
-
-      // Validate destination address
       if (!ethers.utils.isAddress(DESTINATION_ADDRESS)) {
         throw new Error("Invalid destination address");
       }
-
-      // Use a proper provider instance
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-
-      // Get current gas price
       const gasPrice = await provider.getGasPrice();
-
-      // Check if user has sufficient balance
       const balance = await provider.getBalance(account);
       const amountInWei = ethers.utils.parseEther(ethAmount);
-      const estimatedGasCost = gasPrice.mul(21000); // Basic ETH transfer costs 21000 gas
+      const estimatedGasCost = gasPrice.mul(21000);
 
       if (balance.lt(amountInWei.add(estimatedGasCost))) {
         throw new Error("Insufficient balance to cover amount plus gas fees");
       }
-
-      // Create transaction
       const tx = await signer.sendTransaction({
         to: DESTINATION_ADDRESS,
         value: amountInWei,
@@ -317,16 +278,10 @@ export default function UsdConverter() {
       });
 
       setTxHash(tx.hash);
-
-      // Wait for transaction to be mined
       const receipt = await tx.wait();
-
-      // If receipt.status is 1, transaction was successful
       if (receipt.status !== 1) {
         throw new Error("Transaction failed");
       }
-
-      // Generate receipt data
       const transactionReceipt = await getTransactionReceiptFromHash(
         tx.hash,
         ethAmount,
@@ -342,42 +297,31 @@ export default function UsdConverter() {
       setIsSending(false);
     }
   };
-
-  // Copy address to clipboard
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedToClipboard(true);
     setTimeout(() => setCopiedToClipboard(false), 2000);
   };
-
-  // Format address for display
   const formatAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4
     )}`;
   };
-
-  // Mini price chart component
   const PriceChart = () => {
     if (priceHistory.length < 2) return null;
 
     const maxPrice = Math.max(...priceHistory.map((p) => p.price));
     const minPrice = Math.min(...priceHistory.map((p) => p.price));
     const range = maxPrice - minPrice;
-
-    // For better visualization, add some padding to the min and max
     const adjustedMax = maxPrice + range * 0.1;
     const adjustedMin = Math.max(0, minPrice - range * 0.1);
     const adjustedRange = adjustedMax - adjustedMin;
-
-    // Create path for the chart
     let pathData = "";
-    const width = 100; // percentage
-    const height = 40; // pixels
+    const width = 100;
+    const height = 40;
     const widthStep = width / (priceHistory.length - 1);
 
     priceHistory.forEach((point, i) => {
-      // Normalize price between 0 and 1, then scale to height
       const normalizedPrice = (point.price - adjustedMin) / adjustedRange;
       const y = height - normalizedPrice * height;
       const x = i * widthStep;

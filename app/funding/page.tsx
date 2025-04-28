@@ -32,8 +32,6 @@ import { Badge } from "@/components/ui/badge";
 import SparkleButton from "@/components/ui/SparkleButton";
 import { formatCurrency } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
-
-// Import components
 import InvestorCard from "./components/InvestorCard";
 import EducationCreditScore from "./components/EducationCreditScore";
 import SearchFilters from "./components/SearchFilters";
@@ -41,13 +39,11 @@ import ResourceCard from "./components/ResourceCard";
 import ContractCard from "./components/ContractCard";
 import BackgroundGradient from "@/app/components/ui/Aurora";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch - would be replaced with real API calls
 const fetchUserData = async () => {
   try {
     const response = await fetch("/data/students.json");
     const students = await response.json();
-    return students[0]; // Return the first student for demo purposes
+    return students[0];
   } catch (error) {
     console.error("Error fetching user data:", error);
     return null;
@@ -74,8 +70,6 @@ export default function FundingPage() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [expandedInvestor, setExpandedInvestor] = useState<string | null>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-
-  // Current user info
   const currentTime = "2025-03-28 06:48:47";
   const currentUser = "vkhare2909";
 
@@ -94,14 +88,9 @@ export default function FundingPage() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -122,7 +111,6 @@ export default function FundingPage() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter investors based on search, field, and type
     if (investors.length > 0) {
       let filtered = [...investors];
 
@@ -157,8 +145,6 @@ export default function FundingPage() {
       setFilteredInvestors(filtered);
     }
   }, [searchQuery, selectedField, selectedType, investors]);
-
-  // Get all unique fields and funding types from investors
   const allFields = [
     ...new Set(
       investors.flatMap((investor: any) => [
@@ -175,8 +161,6 @@ export default function FundingPage() {
       )
     ),
   ].sort();
-
-  // Statistics animation with GSAP
   useEffect(() => {
     if (!loading && statsRef.current && userData) {
       const statValues = statsRef.current.querySelectorAll(".stat-value");
@@ -193,15 +177,12 @@ export default function FundingPage() {
           snap: { textContent: 1 },
           stagger: 0.2,
           onUpdate: function () {
-            // Format numbers with commas
             statValues.forEach((stat) => {
               const value = parseInt(stat.textContent || "0");
               const format = stat.getAttribute("data-format");
               if (format === "currency") {
-                // @ts-ignore - textContent exists on HTMLElement
                 stat.textContent = "$" + value.toLocaleString();
               } else {
-                // @ts-ignore - textContent exists on HTMLElement
                 stat.textContent = value.toLocaleString();
               }
             });
@@ -210,8 +191,6 @@ export default function FundingPage() {
       );
     }
   }, [loading, userData]);
-
-  // Toggle expanded investor details
   const toggleInvestorExpanded = (id: string) => {
     if (expandedInvestor === id) {
       setExpandedInvestor(null);

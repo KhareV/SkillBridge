@@ -3,8 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-// Current user data
-
 type SparkleButtonProps = {
   children: React.ReactNode;
   href: string;

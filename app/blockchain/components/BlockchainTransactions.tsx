@@ -25,18 +25,12 @@ import {
   formatReceiptData,
 } from "@/lib/blockchain/receipt-service";
 import TransactionReceipt from "@/components/blockchain/TransactionReceipt";
-
-// Use the updated time information
 const CURRENT_TIME = "2025-04-05 22:38:16";
 const CURRENT_USER = "vkhare2909";
-
-// Available testnets
 const TESTNETS = [
   { id: "sepolia", name: "Sepolia", chainId: 11155111 },
   { id: "goerli", name: "Goerli", chainId: 5 },
 ];
-
-// TypeScript declarations for window.ethereum
 declare global {
   interface Window {
     ethereum?: {
@@ -74,8 +68,6 @@ export default function BlockchainTransactions({
   const [receiptData, setReceiptData] = useState<FormattedReceiptData | null>(
     null
   );
-
-  // Check if MetaMask is installed
   useEffect(() => {
     if (typeof window !== "undefined") {
       if (!window.ethereum) {
@@ -85,8 +77,6 @@ export default function BlockchainTransactions({
       }
     }
   }, []);
-
-  // Handle account changes
   useEffect(() => {
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
@@ -100,7 +90,6 @@ export default function BlockchainTransactions({
       });
 
       window.ethereum.on("chainChanged", (chainId: string) => {
-        // Reload page on chain change
         window.location.reload();
       });
     }
@@ -112,20 +101,15 @@ export default function BlockchainTransactions({
       }
     };
   }, []);
-
-  // Connect to MetaMask
   const connectWallet = async () => {
     setIsConnecting(true);
     setError(null);
 
     try {
       if (window.ethereum) {
-        // Request account access
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-
-        // Get network information
         const chainId = await window.ethereum.request({
           method: "eth_chainId",
         });
@@ -133,11 +117,7 @@ export default function BlockchainTransactions({
 
         setAccount(accounts[0]);
         setNetwork(networkName);
-
-        // Get account balance
         await getBalance(accounts[0]);
-
-        // Get transaction history (simulated for testnet)
         getTransactionHistory(accounts[0]);
       } else {
         setError(
@@ -151,12 +131,9 @@ export default function BlockchainTransactions({
       setIsConnecting(false);
     }
   };
-
-  // Get account balance
   const getBalance = async (address: string) => {
     try {
       if (window.ethereum) {
-        // Use ethers v5 syntax
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const balance = await provider.getBalance(address);
         setBalance(ethers.utils.formatEther(balance));
@@ -165,8 +142,6 @@ export default function BlockchainTransactions({
       console.error("Error getting balance:", err);
     }
   };
-
-  // Get network name from chain ID
   const getNetworkName = (chainId: string): string => {
     const networks: { [key: string]: string } = {
       "0x1": "Ethereum Mainnet",
@@ -177,8 +152,6 @@ export default function BlockchainTransactions({
 
     return networks[chainId] || `Chain ID: ${chainId}`;
   };
-
-  // Switch to selected testnet
   const switchNetwork = async (testnet: any) => {
     try {
       setNetworkSwitchInProgress(true);
@@ -195,14 +168,11 @@ export default function BlockchainTransactions({
 
       setSelectedTestnet(testnet);
     } catch (switchError: any) {
-      // This error code indicates that the chain has not been added to MetaMask
       if (switchError.code === 4902) {
         try {
           if (!window.ethereum) {
             throw new Error("MetaMask is not installed");
           }
-
-          // Add the network
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
             params: [
@@ -233,11 +203,7 @@ export default function BlockchainTransactions({
       setNetworkSwitchInProgress(false);
     }
   };
-
-  // Mock transaction history for testnet demo
   const getTransactionHistory = (address: string) => {
-    // In a real app, you would fetch transaction history from an API
-    // For this demo, we'll use mock data
     const mockTransactions = [
       {
         id: "0x8a29fffecf4677be9d2e9bbf39f2455f9ddfc8ca9834e90f138d247aa8fbe4d5",
@@ -245,7 +211,7 @@ export default function BlockchainTransactions({
         amount: "0.1",
         from: "0x3Fc91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
         to: address,
-        timestamp: Date.now() - 86400000, // 1 day ago
+        timestamp: Date.now() - 86400000,
         status: "confirmed",
       },
       {
@@ -254,7 +220,7 @@ export default function BlockchainTransactions({
         amount: "0.05",
         from: address,
         to: destinationAddress,
-        timestamp: Date.now() - 172800000, // 2 days ago
+        timestamp: Date.now() - 172800000,
         status: "confirmed",
       },
       {
@@ -263,15 +229,13 @@ export default function BlockchainTransactions({
         amount: "0.2",
         from: "0x4b83088e43026CdB99A5f0eAD3f3a3fd84A9416A",
         to: address,
-        timestamp: Date.now() - 259200000, // 3 days ago
+        timestamp: Date.now() - 259200000,
         status: "confirmed",
       },
     ];
 
     setTransactions(mockTransactions);
   };
-
-  // Send a transaction
   const sendTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -291,23 +255,15 @@ export default function BlockchainTransactions({
         if (!account) {
           throw new Error("No account connected");
         }
-
-        // Always use the hardcoded destination address
         const recipientAddress = destinationAddress;
-
-        // Prepare transaction parameters
         const transactionParameters = {
           to: recipientAddress,
           from: account,
           value: ethers.utils.parseEther(amount)._hex,
-          gas: "0x5208", // 21000 gas
+          gas: "0x5208",
         };
-
-        // Use ethers v5 syntax
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-
-        // Send transaction
         const transaction = await signer.sendTransaction({
           to: recipientAddress,
           value: ethers.utils.parseEther(amount),
@@ -315,18 +271,11 @@ export default function BlockchainTransactions({
         });
 
         setTxHash(transaction.hash);
-
-        // Wait for transaction to be mined
         const receipt = await transaction.wait();
-        // Use a truthy check instead of comparing to BigInt
         setTxSuccess(!!receipt?.status);
-
-        // Update balance
         if (account) {
           await getBalance(account);
         }
-
-        // Add transaction to history
         const newTx = {
           id: transaction.hash,
           type: "sent",
@@ -338,11 +287,8 @@ export default function BlockchainTransactions({
         };
 
         setTransactions([newTx, ...transactions]);
-
-        // Generate receipt data if transaction was successful
         if (receipt?.status) {
-          // Convert ETH amount to USD (simplified for demo)
-          const ethPrice = 3150; // Hardcoded for simplicity
+          const ethPrice = 3150;
           const amountUsd = (parseFloat(amount) * ethPrice).toFixed(2);
 
           const transactionReceipt = await getTransactionReceiptFromHash(
@@ -352,8 +298,6 @@ export default function BlockchainTransactions({
           );
           setReceiptData(formatReceiptData(transactionReceipt));
         }
-
-        // Reset form
         setAmount("");
         setShowTxForm(false);
       }
@@ -365,22 +309,16 @@ export default function BlockchainTransactions({
       setIsSending(false);
     }
   };
-
-  // Copy address to clipboard
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedToClipboard(true);
     setTimeout(() => setCopiedToClipboard(false), 2000);
   };
-
-  // Format address for display
   const formatAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4
     )}`;
   };
-
-  // Format timestamp
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleString();
@@ -771,8 +709,7 @@ export default function BlockchainTransactions({
                         className="bg-slate-800/50 border border-slate-700/60 rounded-lg p-4 hover:bg-slate-800/70 transition-colors cursor-pointer"
                         onClick={async () => {
                           if (tx.status === "confirmed") {
-                            // Convert ETH amount to USD (simplified for demo)
-                            const ethPrice = 3150; // Hardcoded for simplicity
+                            const ethPrice = 3150;
                             const amountUsd = (
                               parseFloat(tx.amount) * ethPrice
                             ).toFixed(2);
@@ -887,8 +824,6 @@ export default function BlockchainTransactions({
     </div>
   );
 }
-
-// Custom ChevronDown icon to match the design
 function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg

@@ -1,12 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize the Google Generative AI client with API key
 const genAI = new GoogleGenerativeAI(
   process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
 );
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-// Generate a coding problem based on skill and difficulty level
 export async function generateCodingProblem(skill: string, difficulty: string) {
   try {
     const prompt = `
@@ -34,10 +30,7 @@ Return only valid JSON (no additional text).
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-
-    // Parse the JSON response, handling potential formatting issues
     try {
-      // Extract JSON if it's wrapped in markdown code blocks or has additional text
       const jsonContent = text.replace(/```json|```/g, "").trim();
       return JSON.parse(jsonContent);
     } catch (error) {
@@ -52,8 +45,6 @@ Return only valid JSON (no additional text).
     throw error;
   }
 }
-
-// Verify code solution against test cases
 export async function verifyCodeSolution({
   code,
   language,
@@ -68,7 +59,6 @@ export async function verifyCodeSolution({
   mode: "run" | "submit";
 }) {
   try {
-    // Prepare test cases data
     const testCasesData = JSON.stringify(testCases);
 
     const prompt = `
@@ -116,10 +106,7 @@ IMPORTANT:
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-
-    // Parse the JSON response
     try {
-      // Extract JSON if it's wrapped in markdown code blocks
       const jsonContent = text.replace(/```json|```/g, "").trim();
       return JSON.parse(jsonContent);
     } catch (error) {
@@ -132,8 +119,6 @@ IMPORTANT:
     throw error;
   }
 }
-
-// Generate a personalized hint based on the current code
 export async function generatePersonalizedHint({
   code,
   language,
@@ -180,8 +165,6 @@ Return ONLY the hint text without any additional context or explanation.
     throw error;
   }
 }
-
-// Analyze submitted solution for code quality and optimization
 export async function analyzeSolution({
   code,
   language,
@@ -221,10 +204,7 @@ Format your response as valid JSON only.
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-
-    // Parse the JSON response
     try {
-      // Extract JSON if it's wrapped in markdown code blocks
       const jsonContent = text.replace(/```json|```/g, "").trim();
       return JSON.parse(jsonContent);
     } catch (error) {

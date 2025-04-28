@@ -26,8 +26,6 @@ export default function Header() {
   const [currentDateTime, setCurrentDateTime] = useState("2025-04-05 15:08:57");
   const [currentUser, setCurrentUser] = useState("vkhare2909");
   const pathname = usePathname();
-
-  // Update date every minute
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
@@ -46,8 +44,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Close mobile menu on route change
   useEffect(() => {
     setIsOpen(false);
     setActiveDropdown(null);
@@ -92,8 +88,6 @@ export default function Header() {
   const toggleDropdown = (name: string) => {
     setActiveDropdown((prev) => (prev === name ? null : name));
   };
-
-  // Animation variants
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: {
@@ -144,7 +138,7 @@ export default function Header() {
       scale: 1,
       transition: {
         duration: 0.25,
-        ease: [0.22, 1, 0.36, 1], // Custom ease curve
+        ease: [0.22, 1, 0.36, 1],
         staggerChildren: 0.05,
       },
     },

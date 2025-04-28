@@ -14,8 +14,6 @@ const NoiseBackground = ({
 }: NoiseBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  // Current user data
   const currentDateTime = "2025-03-03 19:16:57";
   const currentUser = "vkhare2909";
 
@@ -25,13 +23,9 @@ const NoiseBackground = ({
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    // Set initial dimensions
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     setDimensions({ width: window.innerWidth, height: window.innerHeight });
-
-    // Create off-screen canvas for the noise
     const offscreenCanvas = document.createElement("canvas");
     const offscreenCtx = offscreenCanvas.getContext("2d");
     if (!offscreenCtx) return;
@@ -44,28 +38,24 @@ const NoiseBackground = ({
       offscreenCanvas.height
     );
     let data = imgData.data;
-
-    // Function to generate noise
     const generateNoise = () => {
       for (let i = 0; i < data.length; i += 4) {
         const randColor = Math.floor(Math.random() * 40);
-        data[i] = randColor; // red
-        data[i + 1] = randColor; // green
-        data[i + 2] = randColor; // blue
-        data[i + 3] = Math.random() < 0.2 ? 15 : 0; // alpha (opacity)
+        data[i] = randColor;
+        data[i + 1] = randColor;
+        data[i + 2] = randColor;
+        data[i + 3] = Math.random() < 0.2 ? 15 : 0;
       }
 
       offscreenCtx.putImageData(imgData, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(offscreenCanvas, 0, 0);
-
-      // Add debug info if enabled
       if (debug) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
         ctx.fillRect(10, 10, 250, 90);
 
         ctx.font = "12px monospace";
-        ctx.fillStyle = "rgba(79, 70, 229, 1)"; // Indigo color
+        ctx.fillStyle = "rgba(79, 70, 229, 1)";
         ctx.fillText(`User: ${currentUser}`, 20, 30);
         ctx.fillText(`Time: ${currentDateTime}`, 20, 50);
         ctx.fillText(`Canvas: ${canvas.width}x${canvas.height}px`, 20, 70);

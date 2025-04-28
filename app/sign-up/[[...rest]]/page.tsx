@@ -7,8 +7,6 @@ import { motion } from "framer-motion";
 import { ChevronLeft, GraduationCap, BarChart, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Layout from "@/app/components/layout/Layout";
-
-// Current date/time and user provided in the request
 const currentTime = "2025-04-05 17:11:41";
 const currentUser = "vkhare2909";
 
@@ -171,8 +169,6 @@ function SelectionCard({
   onClick,
 }: CardProps) {
   const [isHovered, setIsHovered] = useState(false);
-
-  // Set appropriate Tailwind classes based on the color prop
   const bgColor = color === "blue" ? "bg-blue-500/20" : "bg-emerald-500/20";
   const textColor = color === "blue" ? "text-blue-400" : "text-emerald-400";
   const borderHoverColor =

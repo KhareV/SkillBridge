@@ -2,11 +2,9 @@
 import BlurText from "./BlurText";
 import { useEffect, useState } from "react";
 function Loader() {
-  // const [loading, setLoading] = useState(true); // unused variable
   const [, setLoading] = useState(true);
 
   useEffect(() => {
-    // Redirect after 2 seconds
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);

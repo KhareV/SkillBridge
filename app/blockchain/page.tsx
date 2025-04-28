@@ -1,10 +1,6 @@
 "use client";
-
-// Current time and user info as requested
 const CURRENT_TIME = "2025-04-05 22:30:16";
 const CURRENT_USER = "vkhare2909";
-
-// Hardcoded destination address for blockchain transactions
 export const DESTINATION_ADDRESS = "0x39DA975981777D1125a4044b1a48d4a558958F0f";
 
 import { useState, useEffect, useRef } from "react";
@@ -24,7 +20,6 @@ export default function BlockchainPage() {
   const proposalParam = searchParams?.get("proposal");
 
   useEffect(() => {
-    // If proposal parameter is present, switch to proposals tab
     if (proposalParam) {
       setActiveTab("proposals");
     }

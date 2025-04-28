@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation"; // Added useRouter
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Star,
@@ -19,8 +19,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import Layout from "@/app/components/layout/Layout";
-
-// Mock data fetch from marketplace.json
 const fetchMarketplaceItem = async (id: string) => {
   try {
     const response = await fetch("/data/marketplace.json");
@@ -34,25 +32,23 @@ const fetchMarketplaceItem = async (id: string) => {
 
 export default function MarketplaceItemPage() {
   const params = useParams<{ id: string }>();
-  const id = params?.id ?? ""; // Use optional chaining and provide a default empty string
+  const id = params?.id ?? "";
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isCheckingOut, setIsCheckingOut] = useState(false); // State for checkout loading
-  const router = useRouter(); // Initialize router
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const loadData = async () => {
       if (id) {
-        // Only fetch if id is available
         const itemData = await fetchMarketplaceItem(id);
         setItem(itemData);
       }
-      // setItem(itemData); // This line was removed as it caused a ReferenceError
       setLoading(false);
     };
 
     loadData();
-  }, [id]); // Keep dependency on id
+  }, [id]);
 
   if (loading) {
     return (
@@ -88,8 +84,6 @@ export default function MarketplaceItemPage() {
       </div>
     );
   }
-
-  // Handler for the Enroll button click
   const handleEnrollClick = async () => {
     if (!item) return;
     setIsCheckingOut(true);
@@ -99,25 +93,20 @@ export default function MarketplaceItemPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ item }), // Send item details to the API
+        body: JSON.stringify({ item }),
       });
 
       if (!response.ok) {
-        // If the response is not OK, maybe the server-side redirect failed
-        // or there was another error. Log it and show an alert.
         const errorData = await response.json();
         console.error("Checkout failed:", errorData);
         alert(`Checkout failed: ${errorData.error || "Unknown error"}`);
         setIsCheckingOut(false);
         return;
       }
-
-      // If the response is OK, parse the URL and redirect client-side
       const { url } = await response.json();
       if (url) {
-        router.push(url); // Redirect the user to Stripe
+        router.push(url);
       } else {
-        // Handle case where URL is missing in the response
         console.error("Checkout failed: No session URL returned from API.");
         alert("Checkout failed: Could not retrieve payment session URL.");
         setIsCheckingOut(false);
@@ -127,7 +116,6 @@ export default function MarketplaceItemPage() {
       alert("An error occurred while initiating checkout. Please try again.");
       setIsCheckingOut(false);
     }
-    // No need to set setIsCheckingOut(false) on success because the page will redirect.
   };
 
   return (

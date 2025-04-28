@@ -11,8 +11,6 @@ const Cursor = () => {
   const [cursorMode, setCursorMode] = useState<CursorMode>("default");
   const [clickCount, setClickCount] = useState(0);
   const [lastActive, setLastActive] = useState(new Date().toISOString());
-
-  // Use motion values for smoother animations
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springConfig = { stiffness: 1000, damping: 30 };
@@ -20,21 +18,16 @@ const Cursor = () => {
   const springY = useSpring(y, springConfig);
 
   useEffect(() => {
-    // Track cursor position
     const updatePosition = (e: MouseEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
       setLastActive(new Date().toISOString());
     };
-
-    // Click events
     const handleMouseDown = () => {
       setClicked(true);
       setClickCount((prev) => prev + 1);
     };
     const handleMouseUp = () => setClicked(false);
-
-    // Hover in/out
     const handleMouseEnter = () => setHidden(false);
     const handleMouseLeave = () => setHidden(true);
 
@@ -43,17 +36,12 @@ const Cursor = () => {
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mouseenter", handleMouseEnter);
     window.addEventListener("mouseleave", handleMouseLeave);
-
-    // Define interactive elements
     const setupInteractiveElements = () => {
-      // Links and buttons
       const interactiveEls = document.querySelectorAll("a, button");
       interactiveEls.forEach((el) => {
         el.addEventListener("mouseenter", () => setCursorMode("link"));
         el.addEventListener("mouseleave", () => setCursorMode("default"));
       });
-
-      // Text inputs
       const textInputs = document.querySelectorAll(
         'input[type="text"], textarea'
       );
@@ -64,14 +52,10 @@ const Cursor = () => {
     };
 
     setupInteractiveElements();
-
-    // Watch for DOM changes
     const observer = new MutationObserver(() => {
       setupInteractiveElements();
     });
     observer.observe(document.body, { childList: true, subtree: true });
-
-    // Cleanup
     return () => {
       window.removeEventListener("mousemove", updatePosition);
       window.removeEventListener("mousedown", handleMouseDown);
@@ -81,8 +65,6 @@ const Cursor = () => {
       observer.disconnect();
     };
   }, [x, y]);
-
-  // Dynamic styles
   const getCursorStyles = () => {
     switch (cursorMode) {
       case "link":
@@ -90,7 +72,7 @@ const Cursor = () => {
           scale: clicked ? 1.1 : 1.4,
           width: "44px",
           height: "44px",
-          borderColor: "rgba(99, 102, 241, 0.75)", // Indigo
+          borderColor: "rgba(99, 102, 241, 0.75)",
           boxShadow: clicked
             ? "0 0 10px rgba(99, 102, 241, 0.5)"
             : "0 0 15px rgba(99, 102, 241, 0.4)",

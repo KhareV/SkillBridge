@@ -101,8 +101,6 @@ function FeatureCard({
     </motion.div>
   );
 }
-
-// New component for the image cards
 type ImageCardProps = {
   imageUrl: string;
   title: string;
@@ -226,8 +224,6 @@ export default function Features() {
         "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1467&q=80",
     },
   ];
-
-  // New image cards data
   const imageCards = [
     {
       imageUrl:

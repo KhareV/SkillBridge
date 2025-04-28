@@ -10,8 +10,6 @@ import {
   User,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-
-// Current user information from the system
 const currentTime = "2025-04-05 19:17:39";
 const currentUser = "vkhare2909";
 
@@ -23,7 +21,6 @@ const EducationCreditScore = forwardRef<
   HTMLDivElement,
   EducationCreditScoreProps
 >(({ userData }, ref) => {
-  // Function to determine score rating and color
   const getScoreRating = (score: number) => {
     const percentage = (score / 900) * 100;
 

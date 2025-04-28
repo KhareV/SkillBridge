@@ -25,13 +25,14 @@ import {
 import SparkleButton from "@/components/ui/SparkleButton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { generateCareerPathRecommendations, generateJobRecommendations } from "@/lib/gemini-api";
+import {
+  generateCareerPathRecommendations,
+  generateJobRecommendations,
+} from "@/lib/gemini-api";
 import { formatCurrency } from "@/lib/utils";
 import LoadingScreen from "../components/ui/LoadingScreen";
 import Layout from "../components/layout/Layout";
 import JobRecommendationCard from "@/components/ui/JobRecommendationCard";
-
-// Mock fetch functions to be replaced with real API calls
 const fetchUserSkills = async () => {
   try {
     const response = await fetch("/data/students.json");
@@ -60,7 +61,7 @@ export default function CareerSimulator() {
   const [userSkills, setUserSkills] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [selectedCareerPath, setSelectedCareerPath] = useState<any>(null);
-  const [careerRecommendations, setCareerRecommendations] = useState<any>(null); // Keep for now, might remove later if unused
+  const [careerRecommendations, setCareerRecommendations] = useState<any>(null);
   const [jobRecommendations, setJobRecommendations] = useState<any[]>([]);
   const [userInterests, setUserInterests] = useState<string[]>([
     "Machine Learning",
@@ -70,8 +71,6 @@ export default function CareerSimulator() {
   const [newInterest, setNewInterest] = useState("");
   const timelineRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
-
-  // Current user info - matches the format from Hero component
   const currentTime = "2025-03-28 05:46:33";
   const currentUser = "vkhare2909";
 
@@ -83,8 +82,6 @@ export default function CareerSimulator() {
       setUserSkills(skills);
       setUserProfile(profile);
       setLoading(false);
-
-      // Generate initial recommendations
       generateRecommendations(skills, profile);
     };
 
@@ -93,10 +90,7 @@ export default function CareerSimulator() {
 
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate heading
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -116,58 +110,49 @@ export default function CareerSimulator() {
     }
   }, [loading]);
 
-  // Removed the mock fetchJobRecommendations function as we'll use the one from gemini-api
-
   const generateRecommendations = async (skills: any[], profile: any) => {
     setLoadingRecommendations(true);
-    setJobRecommendations([]); // Clear previous job recommendations
-    // Keep existing career path recommendations logic for now
-    // setCareerRecommendations(null); // Don't clear career paths
-    // setSelectedCareerPath(null); // Don't clear selected path
+    setJobRecommendations([]);
 
     try {
       const background = profile?.bio || "Student with programming experience";
-
-      // Fetch both in parallel (or sequentially if preferred)
       const [jobs, careerPathsData] = await Promise.all([
         generateJobRecommendations(skills, userInterests, background),
-        // Using the mock career path function for now as per original structure
-        getMockCareerRecommendations(skills, userInterests) // Assuming getMockCareerRecommendations is accessible or defined here/imported
-        // If you want to use the Gemini one (which also uses mock currently):
-        // generateCareerPathRecommendations(skills, userInterests, background)
+        getMockCareerRecommendations(skills, userInterests),
       ]);
 
       setJobRecommendations(jobs);
-
-      // Update career path state only if it was fetched/regenerated
       if (careerPathsData) {
         setCareerRecommendations(careerPathsData);
-        // Optionally reset selected path or keep it
-        // setSelectedCareerPath(careerPathsData.careerPaths[0] || null);
       }
-
-
     } catch (error) {
       console.error("Error generating recommendations:", error);
-      // Handle error state appropriately
     } finally {
       setLoadingRecommendations(false);
     }
   };
-
-  // Need to define or import getMockCareerRecommendations if not already done
-  // For simplicity, let's copy the mock function here if it's not imported
-  // NOTE: This should ideally be imported or handled better in a real app
-  function getMockCareerRecommendations(skills: any[], interests: string[]): any {
+  function getMockCareerRecommendations(
+    skills: any[],
+    interests: string[]
+  ): any {
     const recommendations = {
       careerPaths: [
         {
           title: "Machine Learning Engineer",
           suitabilityScore: 87,
-          requiredSkills: ["Python", "Machine Learning", "Statistics", "TensorFlow"],
+          requiredSkills: [
+            "Python",
+            "Machine Learning",
+            "Statistics",
+            "TensorFlow",
+          ],
           currentMatchPercentage: 75,
           salaryCap: "$130,000",
-          recommendations: ["Take a specialized deep learning course", "Build a portfolio of ML projects", "Learn cloud-based ML deployment"],
+          recommendations: [
+            "Take a specialized deep learning course",
+            "Build a portfolio of ML projects",
+            "Learn cloud-based ML deployment",
+          ],
         },
         {
           title: "Data Scientist",
@@ -175,7 +160,11 @@ export default function CareerSimulator() {
           requiredSkills: ["Python", "Statistics", "Data Visualization", "SQL"],
           currentMatchPercentage: 80,
           salaryCap: "$125,000",
-          recommendations: ["Enhance SQL query optimization skills", "Learn Tableau or Power BI", "Take a course on experimental design"],
+          recommendations: [
+            "Enhance SQL query optimization skills",
+            "Learn Tableau or Power BI",
+            "Take a course on experimental design",
+          ],
         },
         {
           title: "Full Stack Developer",
@@ -183,13 +172,31 @@ export default function CareerSimulator() {
           requiredSkills: ["JavaScript", "React", "Node.js", "SQL"],
           currentMatchPercentage: 65,
           salaryCap: "$115,000",
-          recommendations: ["Build experience with backend frameworks", "Learn about API design and development", "Complete projects with database integration"],
+          recommendations: [
+            "Build experience with backend frameworks",
+            "Learn about API design and development",
+            "Complete projects with database integration",
+          ],
         },
       ],
     };
     if (interests.some((i) => i.toLowerCase().includes("blockchain"))) {
       recommendations.careerPaths.push({
-        title: "Blockchain Developer", suitabilityScore: 75, requiredSkills: ["Solidity", "Smart Contracts", "JavaScript", "Cryptography"], currentMatchPercentage: 50, salaryCap: "$140,000", recommendations: ["Complete a Solidity certification", "Contribute to an open-source blockchain project", "Build a dApp portfolio project"],
+        title: "Blockchain Developer",
+        suitabilityScore: 75,
+        requiredSkills: [
+          "Solidity",
+          "Smart Contracts",
+          "JavaScript",
+          "Cryptography",
+        ],
+        currentMatchPercentage: 50,
+        salaryCap: "$140,000",
+        recommendations: [
+          "Complete a Solidity certification",
+          "Contribute to an open-source blockchain project",
+          "Build a dApp portfolio project",
+        ],
       });
     }
     return recommendations;
@@ -199,8 +206,6 @@ export default function CareerSimulator() {
     if (newInterest.trim() && !userInterests.includes(newInterest.trim())) {
       setUserInterests([...userInterests, newInterest.trim()]);
       setNewInterest("");
-
-      // Regenerate recommendations with new interests
       if (userSkills.length > 0 && userProfile) {
         generateRecommendations(userSkills, userProfile);
       }
@@ -209,14 +214,10 @@ export default function CareerSimulator() {
 
   const removeInterest = (interest: string) => {
     setUserInterests(userInterests.filter((i) => i !== interest));
-
-    // Regenerate recommendations with updated interests
     if (userSkills.length > 0 && userProfile) {
       generateRecommendations(userSkills, userProfile);
     }
   };
-
-  // Timeline animation with GSAP
   useEffect(() => {
     if (selectedCareerPath && timelineRef.current) {
       const timelineItems =
@@ -473,7 +474,7 @@ export default function CareerSimulator() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }} // Add slight delay
+                  transition={{ duration: 0.5, delay: 0.4 }}
                   className="mt-8 bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-white/10 p-6"
                 >
                   <h2 className="text-xl font-bold text-white mb-6 flex items-center">
@@ -482,7 +483,6 @@ export default function CareerSimulator() {
                   </h2>
                   <div className="space-y-4">
                     {jobRecommendations.map((job, index) => (
-                      // Using a simpler card structure here for the left column
                       <motion.div
                         key={job.id}
                         initial={{ opacity: 0, x: -10 }}
@@ -494,7 +494,9 @@ export default function CareerSimulator() {
                           <div className="w-8 h-8 rounded-md bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
                             <Building className="h-4 w-4 text-indigo-300" />
                           </div>
-                          <h3 className="font-semibold text-white truncate">{job.companyName}</h3>
+                          <h3 className="font-semibold text-white truncate">
+                            {job.companyName}
+                          </h3>
                         </div>
                         <div className="space-y-1 text-sm">
                           <div className="flex items-center gap-1.5 text-gray-300">
@@ -535,7 +537,6 @@ export default function CareerSimulator() {
                   </p>
                 </motion.div>
               ) : careerRecommendations ? (
-                // Original UI for Career Path Recommendations
                 <>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -558,10 +559,11 @@ export default function CareerSimulator() {
                             transition={{ duration: 0.3, delay: index * 0.1 }}
                           >
                             <button
-                              className={`w-full p-4 rounded-lg text-left transition-all ${selectedCareerPath?.title === path.title
-                                ? "bg-indigo-500/20 border border-indigo-500/50"
-                                : "bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/30"
-                                }`}
+                              className={`w-full p-4 rounded-lg text-left transition-all ${
+                                selectedCareerPath?.title === path.title
+                                  ? "bg-indigo-500/20 border border-indigo-500/50"
+                                  : "bg-white/5 border border-white/10 hover:bg-white/10 hover:border-indigo-500/30"
+                              }`}
                               onClick={() => setSelectedCareerPath(path)}
                             >
                               <div className="font-semibold text-white mb-2">
@@ -700,17 +702,28 @@ export default function CareerSimulator() {
                                 );
                                 const hasSkill = !!userSkill;
                                 return (
-                                  <div key={index} className="flex justify-between items-center p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                                  <div
+                                    key={index}
+                                    className="flex justify-between items-center p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                                  >
                                     <div className="flex items-center gap-2">
-                                      {hasSkill ? <CheckCircle2 className="h-4 w-4 text-teal-400" /> : <Target className="h-4 w-4 text-amber-400" />}
-                                      <span className="text-gray-300">{skill}</span>
+                                      {hasSkill ? (
+                                        <CheckCircle2 className="h-4 w-4 text-teal-400" />
+                                      ) : (
+                                        <Target className="h-4 w-4 text-amber-400" />
+                                      )}
+                                      <span className="text-gray-300">
+                                        {skill}
+                                      </span>
                                     </div>
                                     {hasSkill ? (
                                       <div className="flex items-center gap-2">
                                         {/* Skill level display */}
                                       </div>
                                     ) : (
-                                      <Badge className="bg-amber-500/20 text-amber-300 border-none text-xs">Needed</Badge>
+                                      <Badge className="bg-amber-500/20 text-amber-300 border-none text-xs">
+                                        Needed
+                                      </Badge>
                                     )}
                                   </div>
                                 );
@@ -727,10 +740,17 @@ export default function CareerSimulator() {
                           <div className="space-y-4" ref={timelineRef}>
                             {selectedCareerPath.recommendations.map(
                               (recommendation: string, index: number) => (
-                                <div key={index} className="timeline-item flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-medium">{index + 1}</div>
+                                <div
+                                  key={index}
+                                  className="timeline-item flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                                >
+                                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-medium">
+                                    {index + 1}
+                                  </div>
                                   <div>
-                                    <div className="font-medium text-white">{recommendation}</div>
+                                    <div className="font-medium text-white">
+                                      {recommendation}
+                                    </div>
                                     {/* ... Timeline text ... */}
                                   </div>
                                 </div>
@@ -744,7 +764,9 @@ export default function CareerSimulator() {
                       {/* Removed "Top Companies Hiring" section */}
 
                       {/* Enhanced Button Section */}
-                      <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-6"> {/* Increased gap and added top border */}
+                      <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-6">
+                        {" "}
+                        {/* Increased gap and added top border */}
                         <Link href="/marketplace" className="flex-1">
                           <SparkleButton
                             href="/marketplace"
@@ -766,7 +788,6 @@ export default function CareerSimulator() {
                   )}
                 </>
               ) : (
-                // Original "No Recommendations Generated" message
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

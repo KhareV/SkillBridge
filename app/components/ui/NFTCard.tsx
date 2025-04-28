@@ -3,8 +3,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { FaCheck, FaEthereum, FaUser, FaClock } from "react-icons/fa";
-
-// Current user data
 const currentDateTime = "2025-03-03 19:15:13";
 const currentUser = "vkhare2909";
 
@@ -139,7 +137,6 @@ export default function NFTCard({
                 className="text-xs text-indigo-400 hover:text-indigo-300"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Open verification modal
                 }}
               >
                 Verify on Blockchain
@@ -149,7 +146,6 @@ export default function NFTCard({
                 className="text-xs text-pink-400 hover:text-pink-300"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Share credential
                 }}
               >
                 Share Credential

@@ -18,16 +18,12 @@ export default function Hero() {
   const currentUser = "vkhare2909";
 
   useEffect(() => {
-    // Animation timeline to make cleanup easier
     const tl = gsap.timeline();
 
     const animateText = async () => {
       try {
         if (headlineRef.current && subtitleRef.current) {
-          // Wait for fonts to load
           await new Promise((resolve) => setTimeout(resolve, 100));
-
-          // Animate the headline
           tl.fromTo(
             headlineRef.current.querySelectorAll("span"),
             {
@@ -44,8 +40,6 @@ export default function Hero() {
               ease: "power3.out",
             }
           );
-
-          // Subtitle animation
           tl.fromTo(
             subtitleRef.current,
             {
@@ -58,18 +52,14 @@ export default function Hero() {
               duration: 0.8,
               ease: "power3.out",
             },
-            "-=0.6" // Start slightly before the headline animation completes
+            "-=0.6"
           );
         }
       } catch (error) {
         console.error("Animation error:", error);
       }
     };
-
-    // Start animation
     animateText();
-
-    // Set up ScrollTrigger for parallax effect (if needed)
     const parallaxEffect = gsap.to(".parallax-bg", {
       yPercent: -20,
       ease: "none",
@@ -80,12 +70,10 @@ export default function Hero() {
         scrub: true,
       },
     });
-
-    // Cleanup function
     return () => {
-      tl.kill(); // Kill the timeline
+      tl.kill();
       if (parallaxEffect && parallaxEffect.scrollTrigger) {
-        parallaxEffect.scrollTrigger.kill(); // Kill the scroll trigger
+        parallaxEffect.scrollTrigger.kill();
       }
     };
   }, []);

@@ -1,8 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-// This endpoint connects student proposals to blockchain proposals
-// In a production system, this would interact with a database
-
 type ProposalConnection = {
   blockchainId: number;
   title: string;
@@ -42,18 +39,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         });
       }
     }
-
-    // Return all connections
     return res.status(200).json(proposalConnections);
   } else if (req.method === "POST") {
-    // Create a new connection (would require authentication in a real app)
     const { studentId, blockchainId, title, ethAmount } = req.body;
 
     if (!studentId || !blockchainId || !title || !ethAmount) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-
-    // In a real app, we would save this to a database
     proposalConnections[studentId] = { blockchainId, title, ethAmount };
 
     return res.status(201).json({

@@ -14,8 +14,6 @@ import {
   Label,
 } from "recharts";
 import { TrendingUp, Award, Star } from "lucide-react";
-
-// Current timestamp and user for component metadata
 const TIMESTAMP = "2025-04-05 23:28:03";
 const CURRENT_USER = "vkhare2909";
 
@@ -28,8 +26,6 @@ interface StudentProgressChartProps {
     }[];
   };
 }
-
-// Define a proper type for ViewBox to fix the TypeScript error
 interface ViewBoxType {
   x: number;
   y: number;
@@ -74,8 +70,6 @@ export function StudentProgressChart({ data }: StudentProgressChartProps) {
   const [achievementPoints, setAchievementPoints] = useState<
     { month: string; value: number; label: string }[]
   >([]);
-
-  // Process data for the chart
   useEffect(() => {
     if (data) {
       const processedData = data.months.map((month, index) => {
@@ -87,8 +81,6 @@ export function StudentProgressChart({ data }: StudentProgressChartProps) {
       });
 
       setChartData(processedData);
-
-      // Add achievement points
       setAchievementPoints([
         { month: "Mar", value: 620, label: "First Certification" },
         { month: "Jun", value: 670, label: "Completed JavaScript Course" },
@@ -249,7 +241,6 @@ export function StudentProgressChart({ data }: StudentProgressChartProps) {
                 <Label
                   position="insideTopRight"
                   content={(props) => {
-                    // Cast the viewBox to our defined type to fix TypeScript error
                     const viewBox = props.viewBox as ViewBoxType;
                     const isHovered = hoveredMonth === point.month;
 

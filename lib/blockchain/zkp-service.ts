@@ -17,23 +17,18 @@ export interface ZkpVerificationResult {
  */
 export async function createImageHash(imageData: string): Promise<string> {
   try {
-    // Remove data URL prefix if present
     const rawData = imageData.includes("base64,")
       ? imageData.split("base64,")[1]
       : imageData;
-
-    // Create SHA-256 hash of the image data
     return await sha256(rawData);
   } catch (error) {
     console.error("Error creating image hash:", error);
-
-    // Fallback method if the library fails
     let hash = 0;
-    const str = imageData.substring(0, 10000); // Limit length for performance
+    const str = imageData.substring(0, 10000);
 
     for (let i = 0; i < str.length; i++) {
       hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0;
     }
 
     return Math.abs(hash).toString(16).padStart(64, "0");
@@ -50,23 +45,13 @@ export async function submitIdentityProofToBlockchain(
     if (!window.ethereum) {
       throw new Error("MetaMask is not installed");
     }
-
-    // Request account access and get signer
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-
-    // Get ZKP contract
     const { zkpContract } = getContracts(provider);
     const zkpWithSigner = zkpContract.connect(signer);
-
-    // Convert proof to bytes32
     const proofBytes = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(proof));
-
-    // Submit proof to the blockchain
     const tx = await zkpWithSigner.submitProof(proofBytes);
-
-    // Wait for transaction to be mined
     const receipt = await tx.wait();
 
     return {

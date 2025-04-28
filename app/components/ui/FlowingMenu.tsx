@@ -31,12 +31,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
   const marqueeContentRef = useRef<HTMLDivElement>(null);
 
   const animationDefaults = { duration: 0.6, ease: "expo" };
-
-  // Initialize marquee animation
   useEffect(() => {
     if (!marqueeContentRef.current) return;
-
-    // Set up continuous animation for the marquee
     gsap.to(marqueeContentRef.current, {
       xPercent: -50,
       ease: "none",
@@ -94,7 +90,6 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
   };
 
   const repeatedMarqueeContent = React.useMemo(() => {
-    // Create more repetitions for smoother looping
     const contents = [];
     for (let i = 0; i < 8; i++) {
       contents.push(
@@ -141,9 +136,5 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
     </div>
   );
 };
-
-// Add current user and date info as a hidden comment
-// Current User: vkhare2909
-// Last Updated: 2025-03-09 12:50:36
 
 export default FlowingMenu;

@@ -25,15 +25,13 @@ const BlurText: React.FC<BlurTextProps> = ({
   rootMargin = "0px",
   animationFrom,
   animationTo,
-  easing = "cubic-bezier(0.215, 0.610, 0.355, 1.000)", // easeOutCubic
+  easing = "cubic-bezier(0.215, 0.610, 0.355, 1.000)",
   onAnimationComplete,
 }) => {
   const elements = animateBy === "words" ? text.split(" ") : text.split("");
   const [inView, setInView] = useState(false);
   const [animatedElements, setAnimatedElements] = useState<number[]>([]);
   const ref = useRef<HTMLParagraphElement>(null);
-
-  // Default animations based on direction
   const defaultFrom: React.CSSProperties = {
     filter: "blur(10px)",
     opacity: 0,
@@ -45,15 +43,11 @@ const BlurText: React.FC<BlurTextProps> = ({
     opacity: 1,
     transform: "translate3d(0,0,0)",
   };
-
-  // Track animation completion
   useEffect(() => {
     if (animatedElements.length === elements.length && onAnimationComplete) {
       onAnimationComplete();
     }
   }, [animatedElements, elements.length, onAnimationComplete]);
-
-  // Intersection Observer to detect when element is in view
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -73,8 +67,6 @@ const BlurText: React.FC<BlurTextProps> = ({
 
     return () => observer.disconnect();
   }, [threshold, rootMargin]);
-
-  // Trigger staggered animations when in view
   useEffect(() => {
     if (inView) {
       elements.forEach((_, index) => {
@@ -86,8 +78,6 @@ const BlurText: React.FC<BlurTextProps> = ({
       });
     }
   }, [inView, elements, delay]);
-
-  // Handle animation transition for each element
   const getElementStyle = (index: number): React.CSSProperties => {
     const isAnimating = animatedElements.includes(index);
     const from = animationFrom || defaultFrom;

@@ -1,18 +1,18 @@
 import mongoose, { Schema, Document, models, Model, Types } from "mongoose";
 
 export interface IInvestorOnboarding extends Document {
-  userId: Types.ObjectId; // Reference to the main User document's _id
-  clerkId: string; // Store Clerk ID for potential direct lookups
-  investmentFocus?: string[]; // e.g., ['EdTech', 'FinTech']
-  preferredStages?: string[]; // e.g., ['Seed', 'Series A']
-  portfolioSize?: string; // e.g., '$100k-$500k', '$1M+'
+  userId: Types.ObjectId;
+  clerkId: string;
+  investmentFocus?: string[];
+  preferredStages?: string[];
+  portfolioSize?: string;
   companyName?: string;
   roleInCompany?: string;
   riskAppetite?: "low" | "medium" | "high";
   linkedInProfile?: string;
   website?: string;
   accreditationStatus?: boolean;
-  onboardingData: Record<string, any>; // Catch-all for other form data
+  onboardingData: Record<string, any>;
   completedAt: Date;
 }
 
@@ -34,12 +34,12 @@ const InvestorOnboardingSchema: Schema<IInvestorOnboarding> = new Schema(
     linkedInProfile: { type: String },
     website: { type: String },
     accreditationStatus: { type: Boolean },
-    onboardingData: { type: Schema.Types.Mixed }, // Flexible field for extra data
+    onboardingData: { type: Schema.Types.Mixed },
     completedAt: { type: Date, default: Date.now },
   },
   {
-    timestamps: { createdAt: "completedAt", updatedAt: false }, // Only use completedAt
-    collection: "investor-onboardings", // Explicit collection name
+    timestamps: { createdAt: "completedAt", updatedAt: false },
+    collection: "investor-onboardings",
   }
 );
 

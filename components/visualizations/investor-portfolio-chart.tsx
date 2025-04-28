@@ -22,19 +22,13 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
 
   useEffect(() => {
     if (!svgRef.current || !data) return;
-
-    // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
-
-    // Set up dimensions
     const svg = d3.select(svgRef.current);
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
     const margin = { top: 20, right: 30, bottom: 50, left: 60 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-
-    // Create scales
     const xScale = d3
       .scaleBand()
       .domain(data.months)
@@ -45,21 +39,15 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, maxValue * 1.1]) // Add 10% padding at the top
+      .domain([0, maxValue * 1.1])
       .range([innerHeight, 0]);
-
-    // Create color scale
     const colorScale = d3
       .scaleOrdinal()
       .domain(data.series.map((s) => s.name))
       .range(["var(--primary)", "var(--secondary)"]);
-
-    // Create the chart group
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-    // Add grid lines
     g.append("g")
       .attr("class", "grid")
       .selectAll("line")
@@ -72,14 +60,10 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
       .attr("y2", (d) => yScale(d))
       .attr("stroke", "currentColor")
       .attr("stroke-opacity", 0.1);
-
-    // Add x-axis
     const xAxis = g
       .append("g")
       .attr("transform", `translate(0, ${innerHeight})`)
       .call(d3.axisBottom(xScale));
-
-    // Style x-axis
     xAxis.selectAll("line").attr("stroke", "currentColor");
     xAxis.selectAll("path").attr("stroke", "currentColor");
     xAxis
@@ -87,24 +71,18 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
       .attr("fill", "currentColor")
       .attr("font-size", "12px")
       .style("text-anchor", "middle");
-
-    // Add y-axis
     const yAxis = g.append("g").call(
       d3
         .axisLeft(yScale)
         .ticks(5)
         .tickFormat((d) => `$${d3.format(",.0f")(d)}`)
     );
-
-    // Style y-axis
     yAxis.selectAll("line").attr("stroke", "currentColor");
     yAxis.selectAll("path").attr("stroke", "currentColor");
     yAxis
       .selectAll("text")
       .attr("fill", "currentColor")
       .attr("font-size", "12px");
-
-    // Add y-axis label
     g.append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", -margin.left + 15)
@@ -113,12 +91,8 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
       .attr("fill", "currentColor")
       .attr("font-size", "12px")
       .text("Amount ($)");
-
-    // Group bars by month
     const months = data.months;
     const barWidth = xScale.bandwidth() / data.series.length;
-
-    // Add bars in groups
     data.series.forEach((series, seriesIndex) => {
       const bars = g
         .selectAll(`.bars-${seriesIndex}`)
@@ -132,8 +106,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .attr("height", 0)
         .attr("fill", colorScale(series.name) as string)
         .attr("opacity", 0.8);
-
-      // Animate bars
       bars
         .transition()
         .duration(1000)
@@ -141,8 +113,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .attr("y", (d) => yScale(d))
         .attr("height", (d) => innerHeight - yScale(d));
     });
-
-    // Add line for the returns series
     const returnsSeries = data.series.find((s) => s.name === "Returns");
 
     if (returnsSeries) {
@@ -159,11 +129,7 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .attr("stroke", "var(--accent)")
         .attr("stroke-width", 3)
         .attr("d", line);
-
-      // Get the total length of the path for animation
       const pathLength = path.node()?.getTotalLength() || 0;
-
-      // Set up path animation
       path
         .attr("stroke-dasharray", pathLength)
         .attr("stroke-dashoffset", pathLength)
@@ -171,8 +137,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .duration(2000)
         .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
-
-      // Add dots on the line
       g.selectAll(".dot")
         .data(returnsSeries.data)
         .enter()
@@ -186,8 +150,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .delay((_, i) => 1500 + i * 100)
         .attr("r", 5);
     }
-
-    // Add legend
     const legend = svg
       .append("g")
       .attr("transform", `translate(${margin.left}, ${height - 20})`);
@@ -212,8 +174,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
         .attr("font-size", "12px")
         .text(series.name);
     });
-
-    // Add hover effects and tooltips
     const tooltip = d3
       .select("body")
       .append("div")
@@ -261,8 +221,6 @@ export function InvestorPortfolioChart({ data }: InvestorPortfolioChartProps) {
 
         tooltip.transition().duration(200).style("opacity", 0);
       });
-
-    // Cleanup
     return () => {
       tooltip.remove();
     };

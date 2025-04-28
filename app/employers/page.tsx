@@ -277,8 +277,6 @@ export default function EmployersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState<string | null>(null);
   const [programFilter, setProgramFilter] = useState<string | null>(null);
-
-  // Current user info
   const currentTime = "2025-03-28 06:20:48";
   const currentUser = "vkhare2909";
 
@@ -295,14 +293,9 @@ export default function EmployersPage() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {

@@ -10,15 +10,12 @@ import "../styles/globals.css";
 import NoiseBackground from "../components/effects/NoiseBackground";
 import Cursor from "../components/effects/Cursor";
 import LoadingScreen from "../components/ui/LoadingScreen";
-
-// Register GSAP plugins
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 export default function App({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
-    // Initialize smooth scrolling with Lenis
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -33,8 +30,6 @@ export default function App({ Component, pageProps, router }: AppProps) {
     }
 
     requestAnimationFrame(raf);
-
-    // Connect GSAP ScrollTrigger to Lenis
     lenis.on("scroll", ScrollTrigger.update);
 
     gsap.ticker.add((time) => {

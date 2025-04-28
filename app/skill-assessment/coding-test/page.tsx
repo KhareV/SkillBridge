@@ -60,7 +60,7 @@ const LANGUAGES = [
     name: "JavaScript",
     icon: "/icons/js.svg",
     defaultTemplate:
-      "function solution(input) {\n  // Write your code here\n  \n  return result;\n}",
+      "function solution(input) {\n  
   },
   {
     id: "python",
@@ -74,25 +74,23 @@ const LANGUAGES = [
     name: "Java",
     icon: "/icons/java.svg",
     defaultTemplate:
-      "public class Solution {\n    public static String solution(String input) {\n        // Write your code here\n        \n        return result;\n    }\n}",
+      "public class Solution {\n    public static String solution(String input) {\n        
   },
   {
     id: "cpp",
     name: "C++",
     icon: "/icons/cpp.svg",
     defaultTemplate:
-      "#include <iostream>\n#include <string>\n\nstd::string solution(std::string input) {\n    // Write your code here\n    \n    return result;\n}",
+      "#include <iostream>\n#include <string>\n\nstd::string solution(std::string input) {\n    
   },
   {
     id: "typescript",
     name: "TypeScript",
     icon: "/icons/ts.svg",
     defaultTemplate:
-      "function solution(input: any): any {\n  // Write your code here\n  \n  return result;\n}",
+      "function solution(input: any): any {\n  
   },
 ];
-
-// Difficulty levels
 const DIFFICULTY_LEVELS = [
   {
     id: "easy",
@@ -116,8 +114,6 @@ const DIFFICULTY_LEVELS = [
     xp: 500,
   },
 ];
-
-// Custom notification component
 function Notification({
   type,
   title,
@@ -173,8 +169,6 @@ export default function CodingTestPage() {
   const searchParams = useSearchParams();
   const skill = searchParams?.get("skill") || "algorithms";
   const levelParam = searchParams?.get("level") || "medium";
-
-  // State variables
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(true);
   const [problem, setProblem] = useState<any>(null);
@@ -192,7 +186,7 @@ export default function CodingTestPage() {
   const [isProblemDescriptionOpen, setIsProblemDescriptionOpen] =
     useState(true);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(3600); // 1 hour in seconds
+  const [timeLeft, setTimeLeft] = useState(3600); 
   const [activeTab, setActiveTab] = useState("description");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -223,16 +217,10 @@ export default function CodingTestPage() {
   });
 
   const editorRef = useRef<any>(null);
-
-  // Update the current time periodically
   useEffect(() => {
-    // Initially set to the specific time
     setCurrentDateTime("2025-04-05 12:48:58");
-
-    // Optional: update it every minute if you want it to be dynamic
     const timer = setInterval(() => {
       const now = new Date();
-      // Format as YYYY-MM-DD HH:MM:SS
       const formatted = now.toISOString().slice(0, 19).replace("T", " ");
       setCurrentDateTime(formatted);
     }, 60000);
@@ -242,8 +230,6 @@ export default function CodingTestPage() {
 
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
-
-    // Set editor options
     editor.updateOptions({
       fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
       fontSize: 14,
@@ -256,17 +242,12 @@ export default function CodingTestPage() {
       smoothScrolling: true,
     });
   };
-
-  // Show notification helper
   const showNotification = (
     type: "success" | "error" | "warning" | "info",
     title: string,
     message: string
   ) => {
-    // Hide any existing notification first
     setNotification((prev) => ({ ...prev, visible: false }));
-
-    // After a brief delay, show the new notification
     setTimeout(() => {
       setNotification({
         visible: true,
@@ -274,15 +255,11 @@ export default function CodingTestPage() {
         title,
         message,
       });
-
-      // Auto-hide after 5 seconds
       setTimeout(() => {
         setNotification((prev) => ({ ...prev, visible: false }));
       }, 5000);
     }, 100);
   };
-
-  // Initialize the problem and timer
   useEffect(() => {
     const fetchProblem = async () => {
       setInitializing(true);
@@ -290,7 +267,6 @@ export default function CodingTestPage() {
       setErrorMessage(null);
 
       try {
-        // Call the Gemini API to generate a coding problem based on skill and difficulty
         const generatedProblem = await generateCodingProblem(
           skill,
           difficulty.id
@@ -305,8 +281,6 @@ export default function CodingTestPage() {
         if (generatedProblem.testCases && generatedProblem.testCases.length) {
           setTotalTests(generatedProblem.testCases.length);
         }
-
-        // Update document title
         document.title = `${generatedProblem.title} | Coding Challenge`;
       } catch (error: any) {
         console.error("Error fetching problem:", error);
@@ -326,8 +300,6 @@ export default function CodingTestPage() {
     };
 
     fetchProblem();
-
-    // Set up the timer
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -340,8 +312,6 @@ export default function CodingTestPage() {
 
     return () => clearInterval(timer);
   }, [skill, difficulty]);
-
-  // Format time left into MM:SS
   const formatTimeLeft = () => {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -349,13 +319,9 @@ export default function CodingTestPage() {
       .toString()
       .padStart(2, "0")}`;
   };
-
-  // Handle language change
   const handleLanguageChange = (languageId: string) => {
     const selectedLanguage =
       LANGUAGES.find((lang) => lang.id === languageId) || LANGUAGES[0];
-
-    // Confirm if code has been modified and user wants to switch
     if (code !== language.defaultTemplate) {
       if (confirm("Changing languages will reset your code. Continue?")) {
         setLanguage(selectedLanguage);
@@ -366,8 +332,6 @@ export default function CodingTestPage() {
       setCode(selectedLanguage.defaultTemplate);
     }
   };
-
-  // Run the code against test cases
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput("");
@@ -378,8 +342,6 @@ export default function CodingTestPage() {
       if (!code.trim()) {
         throw new Error("Please write some code before running.");
       }
-
-      // Use Gemini to verify visible test cases
       const visibleTestCases = problem.testCases.filter(
         (tc: any) => !tc.isHidden
       );
@@ -394,16 +356,12 @@ export default function CodingTestPage() {
 
       setOutput(results.output);
       setTestResults(results.testResults);
-
-      // Count passed tests
       if (results.testResults) {
         const passed = results.testResults.filter(
           (result: any) => result.passed
         ).length;
         setPassedTests(passed);
       }
-
-      // Show success notification if all visible tests passed
       if (results.testResults?.every((result: any) => result.passed)) {
         showNotification(
           "success",
@@ -425,8 +383,6 @@ export default function CodingTestPage() {
       setIsRunning(false);
     }
   };
-
-  // Submit the solution for full verification
   const handleSubmitSolution = async () => {
     setIsSubmitting(true);
     setOutput("");
@@ -438,8 +394,6 @@ export default function CodingTestPage() {
       if (!code.trim()) {
         throw new Error("Please write some code before submitting.");
       }
-
-      // Use Gemini to verify all test cases, including hidden ones
       const results = await verifyCodeSolution({
         code,
         language: language.id,
@@ -450,30 +404,22 @@ export default function CodingTestPage() {
 
       setOutput(results.output);
       setTestResults(results.testResults);
-
-      // Count passed tests
       if (results.testResults) {
         const passed = results.testResults.filter(
           (result: any) => result.passed
         ).length;
         setPassedTests(passed);
-
-        // Set completion status
         if (passed === problem.testCases.length) {
           setSolutionStatus("passed");
           setHasCompletedChallenge(true);
-
-          // Calculate XP earned based on difficulty and hints used
           const baseXP = difficulty.xp;
-          const hintPenalty = revealedHints.length * 10; // 10% penalty per hint
+          const hintPenalty = revealedHints.length * 10; 
           const totalXP = Math.max(
             Math.floor(baseXP * (1 - hintPenalty / 100)),
             Math.floor(baseXP * 0.5)
           );
 
           setEarnedXP(totalXP);
-
-          // Generate code analysis
           analyzeSolutionCode();
 
           showNotification(
@@ -516,8 +462,6 @@ export default function CodingTestPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Generate a personalized hint using Gemini
   const handleGetHint = async () => {
     setIsChecking(true);
     setErrorMessage(null);
@@ -528,8 +472,6 @@ export default function CodingTestPage() {
           "Please write some code first to get a personalized hint."
         );
       }
-
-      // Call Gemini API to generate a personalized hint based on current code
       const hint = await generatePersonalizedHint({
         code,
         language: language.id,
@@ -541,11 +483,9 @@ export default function CodingTestPage() {
       }
 
       setFeedback(hint);
-
-      // Track that user used a personalized hint
       const newRevealedHints = [...revealedHints];
       if (!newRevealedHints.includes(-1)) {
-        newRevealedHints.push(-1); // Use -1 to indicate personalized hint
+        newRevealedHints.push(-1); 
         setRevealedHints(newRevealedHints);
       }
     } catch (error: any) {
@@ -563,20 +503,14 @@ export default function CodingTestPage() {
       setIsChecking(false);
     }
   };
-
-  // Reveal a specific hint
   const revealHint = (index: number) => {
     if (problem?.hints && problem.hints[index]) {
       setFeedback(problem.hints[index]);
-
-      // Track revealed hints
       if (!revealedHints.includes(index)) {
         setRevealedHints([...revealedHints, index]);
       }
     }
   };
-
-  // Analyze submitted solution for feedback
   const analyzeSolutionCode = async () => {
     if (!code.trim() || !hasCompletedChallenge) return;
 

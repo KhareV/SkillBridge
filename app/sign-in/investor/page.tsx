@@ -17,8 +17,6 @@ export default function SignInPage() {
   const { theme } = useTheme();
   const [isLoaded, setIsLoaded] = useState(false);
   const { isSignedIn } = useUser();
-
-  // Updated timestamp and user login as requested
   const currentTime = "2025-04-05 17:06:40";
   const currentUser = "vkhare2909";
 

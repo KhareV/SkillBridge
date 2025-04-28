@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
 /**
@@ -6,22 +5,15 @@ pragma solidity ^0.8.17;
  * @dev Contract for verifying zero-knowledge proofs for identity verification
  */
 contract ZKPVerification {
-    // State variables
     address public owner;
     mapping(address => bool) public verifiedUsers;
     mapping(address => bytes32) public userProofHashes;
-    
-    // Events
     event ProofVerified(address indexed user, bytes32 proofHash);
     event ProofRevoked(address indexed user);
-    
-    // Modifiers
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
     }
-    
-    // Constructor
     constructor() {
         owner = msg.sender;
     }
@@ -31,8 +23,6 @@ contract ZKPVerification {
      * @param _proofHash The hash of the zero-knowledge proof
      */
     function submitProof(bytes32 _proofHash) public {
-        // In a real implementation, we would verify the proof here
-        // For demonstration purposes, we simply store the proof hash
         verifiedUsers[msg.sender] = true;
         userProofHashes[msg.sender] = _proofHash;
         

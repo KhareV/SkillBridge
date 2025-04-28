@@ -9,37 +9,29 @@ import {
   useDetectGPU,
 } from "@react-three/drei";
 import * as THREE from "three";
-
-// Current user data
 const currentDateTime = "2025-03-03 19:35:00";
 const currentUser = "vkhare2909";
-
-// Configuration object for visualization settings
 const CONFIG = {
   roadmap: {
     nodes: 10,
     animationSpeed: 0.5,
-    colorStart: 0.6, // HSL hue value
-    colorEnd: 1.1, // HSL hue value
+    colorStart: 0.6,
+    colorEnd: 1.1,
   },
   forest: {
     gridSize: 5,
-    treeSparsity: 0.3, // Higher = fewer trees
+    treeSparsity: 0.3,
     groundColor: "#1e293b",
     trunkColor: "#78350f",
   },
   network: {
     nodes: 30,
-    edges: 3, // Max edges per node
+    edges: 3,
     radius: 1.5,
   },
   debug: process.env.NODE_ENV === "development",
 };
-
-// Tab labels for the visualization
 const TABS = ["Career Roadmap", "Skill Forest", "Connection Network"];
-
-// Performance monitor for mobile/low-end devices
 const PerformanceMonitor = () => {
   const gpuInfo = useDetectGPU();
   const [fps, setFps] = useState<number>(0);
@@ -53,13 +45,9 @@ const PerformanceMonitor = () => {
 
     const currentFps = 1000 / delta;
     fpsRef.current.push(currentFps);
-
-    // Keep last 60 frames for average
     if (fpsRef.current.length > 60) {
       fpsRef.current.shift();
     }
-
-    // Update FPS every 10 frames
     if (fpsRef.current.length % 10 === 0) {
       const avgFps =
         fpsRef.current.reduce((sum, val) => sum + val, 0) /
@@ -67,12 +55,8 @@ const PerformanceMonitor = () => {
       setFps(Math.round(avgFps));
     }
   });
-
-  // Only show in development mode
   if (!CONFIG.debug) return null;
 };
-
-// User badge that shows in the canvas
 const UserBadge = () => {
   return (
     <Html position={[0, 1.6, 0]} center>
@@ -89,10 +73,7 @@ const CareerRoadmap = ({ isActive }: { isActive: boolean }) => {
 
   const nodes = useMemo(() => {
     const roadNodes = [];
-
-    // Create a path of nodes with a more interesting pattern
     for (let i = 0; i < CONFIG.roadmap.nodes; i++) {
-      // Create a slightly curved path
       const xOffset = Math.sin(i * 0.6) * 0.3;
       roadNodes.push({
         position: new THREE.Vector3(xOffset, i * 0.25 - 1, 0),
@@ -113,11 +94,8 @@ const CareerRoadmap = ({ isActive }: { isActive: boolean }) => {
 
   useFrame(({ clock }) => {
     if (roadRef.current && isActive) {
-      // Smooth rotation animation
       roadRef.current.rotation.y =
         Math.sin(clock.getElapsedTime() * CONFIG.roadmap.animationSpeed) * 0.2;
-
-      // Animate nodes appearing one by one
       const time = clock.getElapsedTime();
       const targetNodes = Math.min(Math.floor(time * 1.5), nodes.length);
       if (targetNodes !== activeNodesRef.current) {
@@ -195,18 +173,13 @@ const SkillForest = ({ isActive }: { isActive: boolean }) => {
   const trees = useMemo(() => {
     const skillTrees = [];
     const gridSize = CONFIG.forest.gridSize;
-
-    // Generate trees in a grid formation
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
-        // Skip some positions randomly
         if (Math.random() < CONFIG.forest.treeSparsity) continue;
 
         const height = Math.random() * 0.5 + 0.2;
         const x = (i - gridSize / 2 + 0.5) * 0.5;
         const z = (j - gridSize / 2 + 0.5) * 0.5;
-
-        // Assign meaningful skill names
         const skills = [
           "React",
           "TypeScript",
@@ -226,7 +199,6 @@ const SkillForest = ({ isActive }: { isActive: boolean }) => {
         skillTrees.push({
           position: [x, 0, z],
           height,
-          // Assign color based on skill category
           color: new THREE.Color().setHSL(skillIndex * 0.08 + 0.3, 0.8, 0.4),
           name: skills[skillIndex],
           userSkill:
@@ -314,8 +286,6 @@ const NetworkGraph = ({ isActive }: { isActive: boolean }) => {
   const graph = useMemo(() => {
     const nodes = [];
     const edges = [];
-
-    // Create random nodes in a spherical formation
     for (let i = 0; i < CONFIG.network.nodes; i++) {
       const phi = Math.random() * Math.PI * 2;
       const theta = Math.random() * Math.PI;
@@ -324,8 +294,6 @@ const NetworkGraph = ({ isActive }: { isActive: boolean }) => {
       const x = radius * Math.sin(theta) * Math.cos(phi);
       const y = radius * Math.sin(theta) * Math.sin(phi);
       const z = radius * Math.cos(theta);
-
-      // User node is special
       const isUserNode = i === 0;
 
       nodes.push({
@@ -337,20 +305,15 @@ const NetworkGraph = ({ isActive }: { isActive: boolean }) => {
         isUserNode,
       });
     }
-
-    // Create edges between some nodes, ensuring the user node is connected
     for (let i = 0; i < nodes.length; i++) {
-      // User node gets more connections
       const connections =
         i === 0
-          ? Math.floor(nodes.length / 3) // User has many connections
+          ? Math.floor(nodes.length / 3)
           : Math.floor(Math.random() * CONFIG.network.edges) + 1;
 
       for (let j = 0; j < connections; j++) {
         const target =
-          i === 0
-            ? j + 1 // User connects to first several nodes
-            : Math.floor(Math.random() * nodes.length);
+          i === 0 ? j + 1 : Math.floor(Math.random() * nodes.length);
 
         if (i !== target && target < nodes.length) {
           const isUserConnection = i === 0 || target === 0;

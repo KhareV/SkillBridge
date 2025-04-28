@@ -1,6 +1,4 @@
 import { ethers } from "ethers";
-
-// Provider types
 export type ProviderType = "metamask" | "infura" | "alchemy";
 
 /**
@@ -12,14 +10,12 @@ export const getProvider = (
 ): ethers.providers.Provider => {
   switch (type) {
     case "metamask":
-      // Browser provider (MetaMask)
       if (typeof window !== "undefined" && window.ethereum) {
         return new ethers.providers.Web3Provider(window.ethereum);
       }
       throw new Error("MetaMask is not installed or not accessible");
 
     case "infura":
-      // Infura provider
       const infuraApiKey = process.env.NEXT_PUBLIC_INFURA_API_KEY;
       if (!infuraApiKey) {
         throw new Error(
@@ -29,7 +25,6 @@ export const getProvider = (
       return new ethers.providers.InfuraProvider(network, infuraApiKey);
 
     case "alchemy":
-      // Alchemy provider
       const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
       if (!alchemyApiKey) {
         throw new Error(
@@ -47,16 +42,13 @@ export const getProvider = (
  * Gets contract interfaces for the ZKP and Proposal contracts
  */
 export const getContractInterfaces = () => {
-  // These ABIs should come from your compiled contracts
   const zkpContractAbi = [
-    // Add your ZKP contract ABI here
     "function submitProof(bytes32 _proofHash)",
     "function isVerified(address _user) view returns (bool)",
     "function getProofHash(address _user) view returns (bytes32)",
   ];
 
   const proposalContractAbi = [
-    // Add your Proposal contract ABI here
     "function vote(uint256 _proposalId, bool _support)",
     "function executeProposal(uint256 _proposalId)",
     "function createProposal(string _title, string _description, uint256 _amount, address _recipient, uint256 _deadline)",

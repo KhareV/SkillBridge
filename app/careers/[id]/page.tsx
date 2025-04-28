@@ -32,11 +32,8 @@ import SparkleButton from "@/components/ui/SparkleButton";
 import { gsap } from "gsap";
 import { LineChart } from "lucide-react";
 import Layout from "@/app/components/layout/Layout";
-
-// Mock data fetch for a specific job
 const fetchJob = async (id: string) => {
   try {
-    // In a real app, this would fetch from an API
     const jobs = [
       {
         id: "job-001",
@@ -98,8 +95,6 @@ const fetchJob = async (id: string) => {
     return null;
   }
 };
-
-// Mock data for user skills
 const fetchUserSkills = async () => {
   return [
     { name: "Python", level: 85 },
@@ -118,8 +113,6 @@ export default function JobDetailPage() {
   const [matchScore, setMatchScore] = useState(0);
   const [isApplied, setIsApplied] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
-
-  // Current user info
   const currentTime = "2025-03-28 05:52:42";
   const currentUser = "vkhare2909";
 
@@ -133,8 +126,6 @@ export default function JobDetailPage() {
 
       setJob(jobData);
       setUserSkills(skills);
-
-      // Calculate match score based on required skills and user skills
       if (jobData && skills.length > 0) {
         const relevantSkills = skills.filter((skill) =>
           jobData.skills.some(
@@ -158,14 +149,9 @@ export default function JobDetailPage() {
 
     loadData();
   }, [id]);
-
-  // Animation effect for the job title and skills
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current,
         {
@@ -179,8 +165,6 @@ export default function JobDetailPage() {
           ease: "power3.out",
         }
       );
-
-      // Animate skills list if it exists
       if (skillListRef.current) {
         const skillItems = skillListRef.current.querySelectorAll(".skill-item");
 
@@ -194,13 +178,11 @@ export default function JobDetailPage() {
             duration: 0.8,
             ease: "power3.out",
           },
-          "-=0.4" // Start slightly before previous animation completes
+          "-=0.4"
         );
       }
     }
   }, [loading]);
-
-  // Format date to readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
@@ -212,8 +194,6 @@ export default function JobDetailPage() {
 
   const handleApply = async () => {
     setIsApplying(true);
-
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     setIsApplying(false);

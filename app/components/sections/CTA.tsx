@@ -7,14 +7,11 @@ import Link from "next/link";
 export default function CTA() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-
-  // Current user data
   const currentDateTime = "2025-03-03 19:12:55";
   const currentUser = "vkhare2909";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Pulse animation for the button
       gsap.to(buttonRef.current, {
         scale: 1.05,
         duration: 1.5,

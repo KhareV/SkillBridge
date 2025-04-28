@@ -30,8 +30,6 @@ import { DESTINATION_ADDRESS } from "../page";
 import { ethers } from "ethers";
 
 type ProposalStatus = "active" | "completed" | "rejected";
-
-// Sample proposals data (in a real app, this would come from a smart contract)
 const PROPOSALS: {
   id: number;
   title: string;
@@ -100,7 +98,6 @@ export default function ProposalList({
   const [balance, setBalance] = useState("0");
 
   useEffect(() => {
-    // Check if MetaMask is available
     if (window.ethereum) {
       window.ethereum
         .request({ method: "eth_accounts" })
@@ -212,14 +209,9 @@ export default function ProposalList({
     }
 
     setIsVoting(true);
-
-    // Simulate blockchain interaction with a delay
     setTimeout(() => {
-      // In a real app, this would be a transaction to a voting smart contract
       setHasVoted({ ...hasVoted, [selectedProposal.id]: voteType });
       setIsVoting(false);
-
-      // Close the dialog after voting
       setTimeout(() => setIsOpen(false), 1500);
     }, 2000);
   };
@@ -244,16 +236,12 @@ export default function ProposalList({
 
     try {
       if (!window.ethereum) throw new Error("Ethereum object not found");
-
-      // Prepare transaction parameters
       const transactionParameters = {
         to: DESTINATION_ADDRESS,
         from: account,
         value: ethers.utils.parseEther(selectedProposal.amount.toString())._hex,
-        gas: "0x5208", // 21000 gas
+        gas: "0x5208",
       };
-
-      // Send the transaction
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
         params: [transactionParameters],

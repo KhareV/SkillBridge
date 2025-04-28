@@ -11,8 +11,6 @@ export default function SignInPage() {
   const router = useRouter();
   const { isSignedIn } = useUser();
   const [activeCard, setActiveCard] = useState(null);
-
-  // Using the provided values
   const currentTime = "2025-04-05 17:08:34";
   const currentUser = "vkhare2909";
 

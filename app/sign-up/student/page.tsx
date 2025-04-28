@@ -16,8 +16,6 @@ export default function SignUpPage() {
   const { theme } = useTheme();
   const [isLoaded, setIsLoaded] = useState(false);
   const { isSignedIn } = useUser();
-
-  // Using the provided timestamp and user login
   const currentTime = "2025-04-05 17:17:32";
   const currentUser = "vkhare2909";
 
@@ -25,8 +23,6 @@ export default function SignUpPage() {
     if (isSignedIn) {
       router.push("/onboarding");
     }
-
-    // Add a subtle background animation effect
     const handleMouseMove = (e: MouseEvent) => {
       const x = e.clientX / window.innerWidth;
       const y = e.clientY / window.innerHeight;

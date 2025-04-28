@@ -55,7 +55,6 @@ export default function FeaturedItem({
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          // Placeholder if no avatar is provided
           <div className="w-full h-full bg-gray-700 flex items-center justify-center">
             <GraduationCap className="w-16 h-16 text-gray-500" />
           </div>

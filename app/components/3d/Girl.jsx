@@ -41,10 +41,7 @@ const Developer = ({ animationName = "idle", ...props }) => {
     if (currentAction) {
       currentAction.reset().fadeIn(0.5).play();
     }
-    // Cleanup function
     return () => {
-      // Look up the action again inside the cleanup
-      // using the animationName from the effect's scope
       const actionToFade = actions[animationName];
       if (actionToFade) {
         actionToFade.fadeOut(0.5);
@@ -121,7 +118,7 @@ const Developer = ({ animationName = "idle", ...props }) => {
   );
 };
 
-useGLTF.preload("/models/girl.glb"); // Corrected path based on useGLTF call inside component
+useGLTF.preload("/models/girl.glb");
 useFBX.preload("/models/idle.fbx");
 useFBX.preload("/models/salute.fbx");
 useFBX.preload("/models/clapping.fbx");

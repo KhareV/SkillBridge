@@ -1,11 +1,9 @@
 import mongoose, { Schema, Document, models, Model } from "mongoose";
-
-// Interface for the blockchain connection document
 export interface IBlockchainConnection extends Document {
-  studentProposalId: string; // ID of the student proposal (e.g., "student-001")
-  blockchainProposalId: number; // ID of the blockchain proposal (e.g., 1)
-  title: string; // Title of the blockchain proposal
-  ethAmount: number; // Amount in ETH
+  studentProposalId: string;
+  blockchainProposalId: number;
+  title: string;
+  ethAmount: number;
   transactions: Array<{
     txHash: string;
     from: string;
@@ -15,8 +13,6 @@ export interface IBlockchainConnection extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
-// Mongoose Schema for BlockchainConnection
 const BlockchainConnectionSchema: Schema<IBlockchainConnection> = new Schema(
   {
     studentProposalId: {
@@ -50,8 +46,6 @@ const BlockchainConnectionSchema: Schema<IBlockchainConnection> = new Schema(
     collection: "blockchain-connections",
   }
 );
-
-// Force delete the cached model in development
 if (
   process.env.NODE_ENV === "development" &&
   mongoose.models.BlockchainConnection

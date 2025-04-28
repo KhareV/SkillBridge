@@ -31,8 +31,6 @@ import MarketplaceItem from "./components/MarketplaceItem";
 import SearchBar from "./components/SearchBar";
 import EmptyState from "./components/EmptyState";
 import Layout from "../components/layout/Layout";
-
-// Mock data fetch (reverted)
 const fetchMarketplaceItems = async () => {
   try {
     const response = await fetch("/data/marketplace.json");
@@ -51,8 +49,6 @@ export default function Marketplace() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [skillFilter, setSkillFilter] = useState<string | null>(null);
   const featuredRef = useRef<HTMLDivElement>(null);
-
-  // Current user info
   const currentTime = "2025-03-28 07:02:12";
   const currentUser = "vkhare2909";
 
@@ -61,8 +57,6 @@ export default function Marketplace() {
   useEffect(() => {
     const loadData = async () => {
       const data = await fetchMarketplaceItems();
-
-      // Reverted: Assume data from JSON is always an array
       setItems(data);
       setFilteredItems(data);
       setLoading(false);
@@ -70,14 +64,9 @@ export default function Marketplace() {
 
     loadData();
   }, []);
-
-  // Animation effect for the heading
   useEffect(() => {
     if (!loading && headlineRef.current) {
-      // Animation timeline
       const tl = gsap.timeline();
-
-      // Animate the headline
       tl.fromTo(
         headlineRef.current.querySelectorAll("span"),
         {
@@ -98,7 +87,6 @@ export default function Marketplace() {
   }, [loading]);
 
   useEffect(() => {
-    // Filter items based on search query, type, and skill
     if (items.length > 0) {
       let filtered = [...items];
 
@@ -131,13 +119,9 @@ export default function Marketplace() {
       setFilteredItems(filtered);
     }
   }, [searchQuery, selectedType, skillFilter, items]);
-
-  // Get unique skills from all items
   const allSkills = [
     ...new Set(items.flatMap((item) => item.skills || [])),
   ].sort();
-
-  // Animate featured items
   useEffect(() => {
     if (!loading && featuredRef.current) {
       gsap.fromTo(
@@ -194,8 +178,6 @@ export default function Marketplace() {
       </div>
     );
   }
-
-  // Featured items (premium or high rating)
   const featuredItems = filteredItems.filter(
     (item) => item.featured || item.premium
   );

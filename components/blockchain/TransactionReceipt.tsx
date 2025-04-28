@@ -25,8 +25,6 @@ import {
   FormattedReceiptData,
   generateReceiptFilename,
 } from "@/lib/blockchain/receipt-service";
-
-// Register fonts
 Font.register({
   family: "Inter",
   fonts: [
@@ -40,8 +38,6 @@ Font.register({
     },
   ],
 });
-
-// PDF styles
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -172,8 +168,6 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
 });
-
-// Transaction Receipt PDF Document
 const TransactionReceiptPDF = ({ data }: { data: FormattedReceiptData }) => (
   <Document>
     <Page size="A4" style={styles.page}>

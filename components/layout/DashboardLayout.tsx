@@ -33,13 +33,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [userRole, setUserRole] = useState<"student" | "investor" | null>(null);
 
   useEffect(() => {
-    // Close sidebar on route change on mobile
     setSidebarOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     if (isLoaded && user) {
-      // Fetch user role from API or use metadata
       const fetchUser = async () => {
         try {
           const response = await fetch(`/api/users/role?userId=${user.id}`);
@@ -47,7 +45,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           if (data.success) {
             setUserRole(data.role);
           } else {
-            // Default to student if not found
             setUserRole("student");
           }
         } catch (error) {

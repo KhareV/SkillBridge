@@ -4,8 +4,6 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-// Blockchain utility functions
 export function formatAddress(address: string) {
   if (!address) return "";
   return `${address.substring(0, 6)}...${address.substring(
@@ -17,8 +15,6 @@ export function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp);
   return date.toLocaleString();
 }
-
-// ETH to USD conversion helper
 export async function getEthPrice() {
   try {
     const response = await fetch(
@@ -28,18 +24,13 @@ export async function getEthPrice() {
     return data.ethereum.usd;
   } catch (error) {
     console.error("Error fetching ETH price:", error);
-    // Fallback to a default value if API fails
     return 3150.42;
   }
 }
-
-// Convert ETH to Wei
 export function ethToWei(ethAmount: string) {
   if (!ethAmount || isNaN(parseFloat(ethAmount))) return "0x0";
   return `0x${(parseFloat(ethAmount) * 1e18).toString(16)}`;
 }
-
-// Generate a random transaction hash (for mock purposes)
 export function generateTxHash() {
   let txHash = "0x";
   const characters = "0123456789abcdef";
@@ -86,13 +77,10 @@ export function getInitials(name: string): string {
 }
 
 export function getRandomColor(seed: string): string {
-  // Simple hash function
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   }
-
-  // Convert to RGB values between 150-250 for bright colors
   const r = (((hash & 0xff0000) >> 16) % 100) + 150;
   const g = (((hash & 0x00ff00) >> 8) % 100) + 150;
   const b = ((hash & 0x0000ff) % 100) + 150;
@@ -141,11 +129,8 @@ export function getTimeAgo(date: string | Date): string {
   const years = Math.floor(months / 12);
   return `${years} years ago`;
 }
-
-// Create image hash for ZKP verification
 export async function createImageHash(imageData: string): Promise<string> {
   try {
-    // Convert the base64 image to array buffer for hashing
     const base64Data = imageData.split(",")[1];
     const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
@@ -153,11 +138,7 @@ export async function createImageHash(imageData: string): Promise<string> {
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
-
-    // Use SubtleCrypto for hashing (browser Web Crypto API)
     const hashBuffer = await crypto.subtle.digest("SHA-256", bytes.buffer);
-
-    // Convert to hex string
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray
       .map((b) => b.toString(16).padStart(2, "0"))
@@ -166,14 +147,12 @@ export async function createImageHash(imageData: string): Promise<string> {
     return hashHex;
   } catch (error) {
     console.error("Error creating image hash:", error);
-
-    // Fallback to a simpler hash if SubtleCrypto fails
     let hash = 0;
-    const str = imageData.substring(0, 10000); // Use first 10000 chars to avoid perf issues
+    const str = imageData.substring(0, 10000);
 
     for (let i = 0; i < str.length; i++) {
       hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0;
     }
 
     return Math.abs(hash).toString(16).padStart(64, "0");

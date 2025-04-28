@@ -10,8 +10,6 @@ export default function ScrollProgress() {
     damping: 30,
     restDelta: 0.001,
   });
-
-  // Current user data
   const currentDateTime = "2025-03-03 19:14:32";
   const currentUser = "vkhare2909";
   const [progress, setProgress] = useState(0);
@@ -19,8 +17,6 @@ export default function ScrollProgress() {
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 300);
-
-      // Calculate scroll percentage for display
       const totalHeight = document.body.scrollHeight - window.innerHeight;
       const currentProgress = Math.round((window.scrollY / totalHeight) * 100);
       setProgress(currentProgress);

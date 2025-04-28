@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
-
-// We'll use a simplified world map for this example
 const mapUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 interface InvestmentMapProps {
@@ -16,7 +14,7 @@ interface InvestmentMapProps {
 
 type InvestmentData = {
   location: string;
-  coordinates: [number, number]; // Properly typed as lat/long tuple
+  coordinates: [number, number];
   amount: number;
   students: number;
 };
@@ -25,26 +23,17 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Store animation instances for cleanup
   const animationsRef = useRef<gsap.core.Tween[]>([]);
 
   useEffect(() => {
     if (!svgRef.current) return;
-
-    // Clear previous visualization
     d3.select(svgRef.current).selectAll("*").remove();
-
-    // Clear previous animations
     animationsRef.current.forEach((anim) => anim.kill());
     animationsRef.current = [];
 
     const svg = d3.select(svgRef.current);
-    // Use props if provided, otherwise use client dimensions
     const actualWidth = width || svgRef.current.clientWidth;
     const actualHeight = height || svgRef.current.clientHeight;
-
-    // Sample investment data with coordinates
     const investmentData: InvestmentData[] = [
       {
         location: "San Francisco",
@@ -119,35 +108,23 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
         students: 1,
       },
     ];
-
-    // Create a size scale for the bubbles
     const sizeScale = d3
       .scaleSqrt()
       .domain([0, d3.max(investmentData, (d) => d.amount) || 100000])
       .range([5, 25]);
-
-    // Create a color scale for the bubbles
     const colorScale = d3
       .scaleLinear<string>()
       .domain([0, d3.max(investmentData, (d) => d.amount) || 100000])
       .range(["var(--primary-300)", "var(--primary-600)"]);
-
-    // Create a projection
     const projection = d3
       .geoMercator()
       .scale(actualWidth / 6)
       .center([0, 40])
       .translate([actualWidth / 2, actualHeight / 2]);
-
-    // Create a path generator
     const path = d3.geoPath().projection(projection);
-
-    // Create a group for the map
     const mapGroup = svg.append("g");
-
-    // Tooltip creation - move outside of the map loading to avoid duplicates
     const tooltipId = "investment-map-tooltip";
-    d3.select(`#${tooltipId}`).remove(); // Remove any existing tooltip
+    d3.select(`#${tooltipId}`).remove();
 
     const tooltip = d3
       .select("body")
@@ -165,14 +142,11 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
       .style("z-index", "1000")
       .style("box-shadow", "0 2px 10px rgba(0, 0, 0, 0.1)")
       .style("border", "1px solid var(--border)");
-
-    // Load and draw the world map
     setIsLoading(true);
     setError(null);
 
     d3.json(mapUrl)
       .then((worldData: any) => {
-        // Draw countries
         mapGroup
           .selectAll("path")
           .data(
@@ -185,8 +159,6 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
           .attr("fill", "var(--muted)")
           .attr("stroke", "var(--border)")
           .attr("stroke-width", 0.5);
-
-        // Add investment bubbles
         const bubbles = svg
           .selectAll(".bubble")
           .data(investmentData)
@@ -206,15 +178,11 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
           .attr("fill-opacity", 0.7)
           .attr("stroke", "var(--background)")
           .attr("stroke-width", 1);
-
-        // Animate bubbles
         bubbles
           .transition()
           .duration(1000)
           .delay((_, i) => i * 100)
           .attr("r", (d) => sizeScale(d.amount));
-
-        // Add pulsing animation with proper tracking for cleanup
         bubbles.each(function () {
           const anim = gsap.to(this, {
             r: "+=2",
@@ -226,8 +194,6 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
           });
           animationsRef.current.push(anim);
         });
-
-        // Add tooltips with improved positioning
         bubbles
           .on("mouseover", function (event, d) {
             d3.select(this)
@@ -253,7 +219,6 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
               .style("opacity", 0.9);
           })
           .on("mousemove", function (event) {
-            // Update tooltip position on mouse move for better UX
             tooltip
               .style("left", `${event.pageX + 15}px`)
               .style("top", `${event.pageY - 28}px`);
@@ -275,38 +240,22 @@ export function InvestmentMap({ width, height }: InvestmentMapProps) {
         setError("Failed to load map data");
         setIsLoading(false);
       });
-
-    // Handle resize events
     const handleResize = () => {
       if (svgRef.current) {
-        // Redraw the visualization on resize
-        // This could be optimized further to avoid full redraws
         d3.select(svgRef.current).selectAll("*").remove();
         renderMap();
       }
     };
-
-    // Define renderMap function for resize handler
-    const renderMap = () => {
-      // The rendering logic could be extracted here
-      // For simplicity, we'll just trigger a re-render
-    };
+    const renderMap = () => {};
 
     window.addEventListener("resize", handleResize);
-
-    // Cleanup function
     return () => {
-      // Remove tooltip
       d3.select(`#${tooltipId}`).remove();
-
-      // Kill all GSAP animations
       animationsRef.current.forEach((anim) => anim.kill());
       animationsRef.current = [];
-
-      // Remove resize listener
       window.removeEventListener("resize", handleResize);
     };
-  }, [width, height]); // Add width and height to dependency array
+  }, [width, height]);
 
   return (
     <motion.div

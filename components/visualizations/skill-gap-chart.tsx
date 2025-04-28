@@ -10,8 +10,8 @@ interface SkillData {
 }
 
 interface SkillGapChartProps {
-  skills: SkillData[]; // Required skills
-  talentPool: SkillData[]; // Available talent skills
+  skills: SkillData[];
+  talentPool: SkillData[];
 }
 
 export function SkillGapChart({ skills, talentPool }: SkillGapChartProps) {
@@ -287,8 +287,6 @@ export function SkillGapChart({ skills, talentPool }: SkillGapChartProps) {
     const legend = svg
       .append("g")
       .attr("transform", `translate(${margin.left}, ${height - 20})`);
-
-    // Required skills legend item
     const requiredLegend = legend
       .append("g")
       .attr("transform", "translate(0, 0)");

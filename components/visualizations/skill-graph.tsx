@@ -36,7 +36,6 @@ interface ProcessedSkill {
   suggested?: boolean;
   fromSkill?: string;
   description?: string;
-  // For cluster layout
   clusterX?: number;
   clusterY?: number;
   angle?: number;
@@ -65,29 +64,21 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const { theme } = useTheme();
   const [graphBounds, setGraphBounds] = useState({ width: 800, height: 600 });
-
-  // Current user and time information - updated as requested
   const currentTime = "2025-03-28 12:44:34";
   const currentUser = "vkhare2909";
-
-  // Color palette from the previous visualization
   const colorPalette = useMemo(
     () => [
-      { main: "#38bdf8", light: "#7dd3fc", dark: "#0284c7" }, // Sky
-      { main: "#818cf8", light: "#a5b4fc", dark: "#4f46e5" }, // Indigo
-      { main: "#c084fc", light: "#d8b4fe", dark: "#9333ea" }, // Purple
-      { main: "#2dd4bf", light: "#5eead4", dark: "#0d9488" }, // Teal
-      { main: "#fb7185", light: "#fda4af", dark: "#e11d48" }, // Rose
-      { main: "#fcd34d", light: "#fde68a", dark: "#d97706" }, // Amber
+      { main: "#38bdf8", light: "#7dd3fc", dark: "#0284c7" },
+      { main: "#818cf8", light: "#a5b4fc", dark: "#4f46e5" },
+      { main: "#c084fc", light: "#d8b4fe", dark: "#9333ea" },
+      { main: "#2dd4bf", light: "#5eead4", dark: "#0d9488" },
+      { main: "#fb7185", light: "#fda4af", dark: "#e11d48" },
+      { main: "#fcd34d", light: "#fde68a", dark: "#d97706" },
     ],
     []
   );
-
-  // Group skills by category or create categories
   const groupedSkills = useMemo(() => {
     const categories: { [key: string]: Skill[] } = {};
-
-    // Try to derive categories by analyzing skill names
     skills.forEach((skill) => {
       const keywords = [
         "Frontend",
@@ -115,7 +106,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       }
 
       if (!matched) {
-        // Group by skill level as fallback
         const levelCategory =
           skill.level > 75
             ? "Advanced"
@@ -129,8 +119,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
 
     return categories;
   }, [skills]);
-
-  // Helper function to match skills to categories
   function skillMatchesCategory(skillName: string, category: string): boolean {
     const categoryKeywords: { [key: string]: string[] } = {
       Frontend: [
@@ -206,43 +194,25 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       skillName.toLowerCase().includes(keyword.toLowerCase())
     );
   }
-
-  // Process skills for visualization with initial cluster positioning
   const processedNodes = useMemo(() => {
     let nodes: ProcessedSkill[] = [];
     let categoryIndex = 0;
-
-    // Calculate the center point for the mind map
     const centerX = 0;
     const centerY = 0;
-
-    // Get the categories for radial arrangement
     const categories = Object.keys(groupedSkills);
     const categoryCount = categories.length;
-
-    // Process grouped skills with structured layout
     Object.entries(groupedSkills).forEach(
       ([category, categorySkills], cidx) => {
-        // Calculate the angle for this category in the circle
         const categoryAngle = (cidx * (2 * Math.PI)) / categoryCount;
-
-        // Category center point - place categories in a circle around the center
-        const categoryRadius = 250; // Distance from center
+        const categoryRadius = 250;
         const categoryX = centerX + categoryRadius * Math.cos(categoryAngle);
         const categoryY = centerY + categoryRadius * Math.sin(categoryAngle);
-
-        // Process skills in this category
         categorySkills.forEach((skill, skillIndex) => {
           const colorIndex = categoryIndex % colorPalette.length;
           const colors = colorPalette[colorIndex];
-
-          // Calculate position within the cluster
-          // Arrange skills in a smaller circle or grid around the category center
           const skillCount = categorySkills.length;
           const skillAngle =
-            categoryAngle + (skillIndex - skillCount / 2) * (Math.PI / 12); // Spread skills in an arc
-
-          // Adjust distance based on level (higher level = closer to center)
+            categoryAngle + (skillIndex - skillCount / 2) * (Math.PI / 12);
           const distanceFromCategory = 60 + (100 - skill.level) / 5;
 
           const skillX =
@@ -255,13 +225,11 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
             colorMain: colors.main,
             colorLight: colors.light,
             colorDark: colors.dark,
-            radius: 10 + (skill.level / 100) * 10, // Smaller radius for cleaner look
+            radius: 10 + (skill.level / 100) * 10,
             suggested: false,
             category,
-            // Store the target coordinates for this node
             x: skillX,
             y: skillY,
-            // Store cluster info for forces
             clusterX: categoryX,
             clusterY: categoryY,
             angle: skillAngle,
@@ -275,49 +243,36 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
 
     return nodes;
   }, [groupedSkills, colorPalette]);
-
-  // Generate more structured links between skills
   const processedLinks = useMemo(() => {
     const links: Link[] = [];
-
-    // Create a central hub node for each category (virtual node)
     const categoryCenters: { [key: string]: { x: number; y: number } } = {};
     Object.keys(groupedSkills).forEach((category) => {
       const categoryNodes = processedNodes.filter(
         (n) => n.category === category
       );
       if (categoryNodes.length > 0) {
-        // Find the average position of the first node in each category
         categoryCenters[category] = {
           x: categoryNodes[0].clusterX || 0,
           y: categoryNodes[0].clusterY || 0,
         };
       }
     });
-
-    // Generate hierarchical links - each skill connects to its category center
     Object.entries(groupedSkills).forEach(([category, categorySkills]) => {
       const categoryNodes = processedNodes.filter(
         (n) => n.category === category
       );
-
-      // Connect nodes within same category with a more structured pattern
       for (let i = 0; i < categoryNodes.length; i++) {
         if (i > 0) {
-          // Connect to previous node in same category (creates a chain)
           links.push({
             source: categoryNodes[i - 1].id,
             target: categoryNodes[i].id,
-            strength: 0.7, // Stronger connections within category
+            strength: 0.7,
             type: "core",
           });
         }
       }
-
-      // Add some cross-category links for related skills
       for (let i = 0; i < processedNodes.length; i++) {
         for (let j = i + 1; j < processedNodes.length; j++) {
-          // Only connect if they're in different categories but related
           if (
             processedNodes[i].category !== processedNodes[j].category &&
             areSkillsRelated(processedNodes[i].name, processedNodes[j].name)
@@ -325,7 +280,7 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
             links.push({
               source: processedNodes[i].id,
               target: processedNodes[j].id,
-              strength: 0.15, // Weaker cross-category connections
+              strength: 0.15,
               type: "core",
             });
           }
@@ -335,8 +290,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
 
     return links;
   }, [processedNodes, groupedSkills]);
-
-  // Initialize graph data
   useEffect(() => {
     if (processedNodes.length > 0 && !isInitialized) {
       setData({
@@ -346,8 +299,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       setIsInitialized(true);
     }
   }, [processedNodes, processedLinks, isInitialized]);
-
-  // Update graph bounds when the container resizes
   useEffect(() => {
     if (graphRef.current) {
       const updateBounds = () => {
@@ -361,14 +312,9 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       return () => window.removeEventListener("resize", updateBounds);
     }
   }, []);
-
-  // Check if two skills are related
   function areSkillsRelated(skillA: string, skillB: string): boolean {
-    // Basic algorithm to check skill relatedness
     const wordMapA = new Set(skillA.toLowerCase().split(/[\s\-_.,;:]/));
     const wordMapB = new Set(skillB.toLowerCase().split(/[\s\-_.,;:]/));
-
-    // Check for common words
     let commonWords = 0;
     wordMapA.forEach((word) => {
       if (wordMapB.has(word) && word.length > 2) commonWords++;
@@ -378,39 +324,27 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       commonWords > 0 || skillA.includes(skillB) || skillB.includes(skillA)
     );
   }
-
-  // Simulate Gemini API to generate suggested skills
   const generateSkillSuggestions = async () => {
     setIsGenerating(true);
 
     try {
-      // Simulate API call with a timeout
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // The actual suggestions would come from Gemini API
-      // For now, we'll simulate it with generated suggestions
       const suggestedSkills = generateMockSuggestions();
-
-      // Add the suggested skills to the graph
       setData((prevData) => {
-        // Create new nodes
         const newNodes = [...prevData.nodes];
         const newLinks: Link[] = [...prevData.links];
 
         suggestedSkills.forEach((suggestion) => {
-          // Check if the skill already exists to avoid duplicates
           if (
             !newNodes.some(
               (node) =>
                 node.name.toLowerCase() === suggestion.name.toLowerCase()
             )
           ) {
-            // Find parent node to place suggestion near it
             const parentNode = newNodes.find(
               (n) => n.id === suggestion.fromSkill
             );
             if (parentNode) {
-              // Position the suggestion near its parent node
               const angle =
                 (parentNode.angle || 0) + (Math.random() * 0.5 - 0.25);
               const distance = (parentNode.distance || 100) + 30;
@@ -424,11 +358,7 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
               suggestion.angle = angle;
               suggestion.distance = distance;
             }
-
-            // Add the suggestion as a new node
             newNodes.push(suggestion);
-
-            // Add a link to the related skill
             newLinks.push({
               source: suggestion.fromSkill!,
               target: suggestion.id,
@@ -443,8 +373,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           links: newLinks,
         };
       });
-
-      // Create a ripple effect animation for each new suggestion
       setTimeout(() => {
         suggestedSkills.forEach((skill) => {
           if (graphRef.current) {
@@ -455,8 +383,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
               const nodeElement = node.node() as SVGElement;
               const nodeRect = nodeElement.getBoundingClientRect();
               const graphRect = graphRef.current.getBoundingClientRect();
-
-              // Calculate relative position
               const x = nodeRect.left - graphRect.left + nodeRect.width / 2;
               const y = nodeRect.top - graphRect.top + nodeRect.height / 2;
 
@@ -471,8 +397,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       setIsGenerating(false);
     }
   };
-
-  // Function to create a ripple animation
   const createRipple = (x: number, y: number, color: string) => {
     if (!graphRef.current) return;
 
@@ -505,23 +429,17 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       },
     });
   };
-
-  // Mock function to generate skill suggestions (would be replaced by Gemini API)
   const generateMockSuggestions = () => {
     const suggestions: ProcessedSkill[] = [];
     const usedNodes = new Set<string>();
-
-    // Get 3 random skills to create suggestions for
     const nodesToUse = data.nodes.filter((node) => !node.suggested);
     const shuffled = [...nodesToUse].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, Math.min(shuffled.length, 3));
 
     selected.forEach((node) => {
-      // Generate suggestions for this node
       const suggestedSkillsForNode = getSuggestedSkillsForNode(node);
 
       suggestedSkillsForNode.forEach((skill) => {
-        // Only add if we haven't already suggested this
         if (!usedNodes.has(skill.name)) {
           suggestions.push(skill);
           usedNodes.add(skill.name);
@@ -531,13 +449,8 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
 
     return suggestions;
   };
-
-  // Generate relevant skill suggestions based on a skill
   const getSuggestedSkillsForNode = (node: ProcessedSkill) => {
-    // This would be the Gemini API call in a real implementation
     const suggestions: ProcessedSkill[] = [];
-
-    // Common skill pairings by category
     const skillSuggestions: { [key: string]: string[] } = {
       Frontend: [
         "React Testing Library",
@@ -619,12 +532,8 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
         "Problem Solving",
       ],
     };
-
-    // Get suggestions based on category
     const category = node.category || "Beginner";
     const potentialSuggestions = skillSuggestions[category] || [];
-
-    // Also check for name-based matches
     const specificSuggestions: string[] = [];
     if (node.name.includes("React"))
       specificSuggestions.push("Redux", "React Router", "React Query");
@@ -638,8 +547,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       specificSuggestions.push("Sass", "CSS-in-JS", "CSS Modules");
     if (node.name.includes("AWS"))
       specificSuggestions.push("S3", "Lambda", "EC2", "DynamoDB");
-
-    // Get 1-2 suggestions
     const allSuggestions = [...potentialSuggestions, ...specificSuggestions];
     const shuffled = [...new Set(allSuggestions)].sort(
       () => 0.5 - Math.random()
@@ -647,7 +554,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
     const selected = shuffled.slice(0, Math.min(2, shuffled.length));
 
     selected.forEach((suggestionName, idx) => {
-      // Don't suggest skills that already exist
       if (
         data.nodes.some(
           (n) => n.name.toLowerCase() === suggestionName.toLowerCase()
@@ -655,8 +561,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       ) {
         return;
       }
-
-      // Create new suggested skill
       const colorIndex = (data.nodes.length + idx) % colorPalette.length;
       const colors = colorPalette[colorIndex];
 
@@ -669,7 +573,7 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
         colorMain: colors.main,
         colorLight: colors.light,
         colorDark: colors.dark,
-        radius: 8, // Smaller than normal skills
+        radius: 8,
         category: node.category,
         suggested: true,
         fromSkill: node.id,
@@ -679,22 +583,14 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
 
     return suggestions;
   };
-
-  // Initialize the force graph with structured layout
   useEffect(() => {
     if (!graphRef.current || !data.nodes.length) return;
 
     const width = graphRef.current.clientWidth || 800;
     const height = graphRef.current.clientHeight || 600;
-
-    // Clear previous contents
     const svg = d3.select(graphRef.current);
     svg.selectAll("*").remove();
-
-    // Prepare SVG with defs for gradients
     const defs = svg.append("defs");
-
-    // Create gradients for each node
     data.nodes.forEach((node) => {
       const gradient = defs
         .append("radialGradient")
@@ -717,8 +613,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
         .attr("stop-color", node.colorMain)
         .attr("stop-opacity", node.suggested ? 0.7 : 0.8);
     });
-
-    // Filter for glow effect
     const filter = defs
       .append("filter")
       .attr("id", "glow")
@@ -735,8 +629,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
     const feMerge = filter.append("feMerge");
     feMerge.append("feMergeNode").attr("in", "coloredBlur");
     feMerge.append("feMergeNode").attr("in", "SourceGraphic");
-
-    // Create marker for arrows on suggested links
     defs
       .append("marker")
       .attr("id", "arrowhead")
@@ -749,11 +641,7 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
       .attr("fill", "#ffffff");
-
-    // Create container for zoom/pan
     const container = svg.append("g").attr("class", "container");
-
-    // Add category backgrounds for better visual grouping
     const categories = Array.from(new Set(data.nodes.map((n) => n.category)));
     const categoryGroups = container
       .append("g")
@@ -763,8 +651,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .enter()
       .append("g")
       .attr("class", (d) => `category-group-${d}`);
-
-    // Add category labels
     categoryGroups
       .append("text")
       .attr("class", "category-label")
@@ -774,14 +660,11 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("fill", "rgba(255, 255, 255, 0.7)")
       .attr("text-anchor", "middle")
       .attr("dy", "-20px");
-
-    // Add category background
     categoryGroups
       .append("circle")
       .attr("class", "category-background")
       .attr("r", 130)
       .attr("fill", (d, i) => {
-        // Get color from the first node in this category
         const firstNode = data.nodes.find((n) => n.category === d);
         return firstNode
           ? `${firstNode.colorMain}10`
@@ -795,8 +678,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       })
       .attr("stroke-width", 1)
       .attr("stroke-dasharray", "3,3");
-
-    // Zoom behavior
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.2, 2])
@@ -809,8 +690,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       zoom.transform,
       d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
     );
-
-    // Create links with curved paths
     const linkElements = container
       .append("g")
       .attr("class", "links")
@@ -832,8 +711,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("marker-end", (d) =>
         d.type === "suggested" ? "url(#arrowhead)" : null
       );
-
-    // Create nodes
     const nodeElements = container
       .append("g")
       .attr("class", "nodes")
@@ -852,20 +729,16 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       )
       .on("click", (event, d) => {
         setSelectedNode(d);
-        d3.select(event.currentTarget).raise(); // Bring to front
+        d3.select(event.currentTarget).raise();
       })
       .on("mouseover", (event, d) => {
         setHoveredNode(d);
-
-        // Highlight node
         d3.select(event.currentTarget)
           .select("circle.node-circle")
           .transition()
           .duration(300)
           .attr("r", d.radius + 3)
           .attr("filter", "url(#glow)");
-
-        // Highlight connections
         const connectedNodeIds = new Set();
         data.links.forEach((link) => {
           const sourceId =
@@ -876,8 +749,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           if (sourceId === d.id) connectedNodeIds.add(targetId);
           if (targetId === d.id) connectedNodeIds.add(sourceId);
         });
-
-        // Highlight connected nodes
         d3.selectAll(".node")
           .filter(function (n: any) {
             return connectedNodeIds.has(n.id);
@@ -887,8 +758,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           .duration(300)
           .attr("r", (n: any) => n.radius + 2)
           .attr("filter", "url(#glow)");
-
-        // Highlight related links
         d3.selectAll("path.link")
           .filter(function (l: any) {
             const sourceId =
@@ -908,8 +777,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       })
       .on("mouseout", (event, d) => {
         setHoveredNode(null);
-
-        // Reset highlight if not selected
         if (!selectedNode || selectedNode.id !== d.id) {
           d3.select(event.currentTarget)
             .select("circle.node-circle")
@@ -918,8 +785,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
             .attr("r", d.radius)
             .attr("filter", d.suggested ? "url(#glow)" : null);
         }
-
-        // Reset all links
         d3.selectAll("path.link")
           .transition()
           .duration(300)
@@ -928,8 +793,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           )
           .attr("stroke-width", (l) => (l.type === "suggested" ? 1.5 : 0.8))
           .attr("opacity", (l) => (l.type === "suggested" ? 0.6 : 0.3));
-
-        // Reset all other nodes
         d3.selectAll(".node")
           .filter(function (n: any) {
             return n.id !== d.id && (!selectedNode || n.id !== selectedNode.id);
@@ -940,8 +803,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           .attr("r", (n: any) => n.radius)
           .attr("filter", (n: any) => (n.suggested ? "url(#glow)" : null));
       });
-
-    // Node circles
     nodeElements
       .append("circle")
       .attr("class", "node-circle")
@@ -951,8 +812,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("stroke", (d) => d.colorDark)
       .attr("stroke-width", (d) => (d.suggested ? 1.5 : 1))
       .attr("stroke-dasharray", (d) => (d.suggested ? "2,2" : null));
-
-    // Sparkle indicator for suggested skills
     nodeElements
       .filter((d) => d.suggested)
       .append("text")
@@ -963,8 +822,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("font-size", 10)
       .attr("fill", "#ffffff")
       .text("✨");
-
-    // Node labels
     nodeElements
       .append("text")
       .attr("class", "node-label")
@@ -978,8 +835,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("stroke-width", 2)
       .attr("paint-order", "stroke")
       .text((d) => d.name);
-
-    // Node level indicators
     nodeElements
       .append("text")
       .attr("class", "node-level")
@@ -990,15 +845,13 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       .attr("font-weight", "bold")
       .attr("fill", "white")
       .text((d) => d.level);
-
-    // Initialize with a more structured force simulation
     const simulation = d3
       .forceSimulation(data.nodes as d3.SimulationNodeDatum[])
       .alpha(0.3)
-      .alphaDecay(0.02) // Slower decay for smoother movement
-      .velocityDecay(0.4) // Add more friction
-      .force("charge", d3.forceManyBody().strength(-50)) // Weaker repulsion
-      .force("center", d3.forceCenter(0, 0).strength(0.05)) // Weak centering force
+      .alphaDecay(0.02)
+      .velocityDecay(0.4)
+      .force("charge", d3.forceManyBody().strength(-50))
+      .force("center", d3.forceCenter(0, 0).strength(0.05))
       .force(
         "link",
         d3
@@ -1011,22 +864,17 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
         "collide",
         d3.forceCollide().radius((d: any) => (d as ProcessedSkill).radius * 1.8)
       )
-      // Add a custom force to pull nodes toward their cluster position
       .force("clusterPosition", (alpha) => {
         for (let i = 0; i < data.nodes.length; i++) {
           const d = data.nodes[i];
-          // Pull each node toward its predefined position
           const targetX = d.x || 0;
           const targetY = d.y || 0;
-
-          // Apply force toward target position
           d.vx = d.vx || 0;
           d.vy = d.vy || 0;
           d.vx += (targetX - (d.x || 0)) * alpha * 0.3;
           d.vy += (targetY - (d.y || 0)) * alpha * 0.3;
         }
       })
-      // Add boundary force to keep nodes within visible area
       .force("boundary", (alpha) => {
         const padding = 50;
         const radius = Math.min(width, height) / 2;
@@ -1038,7 +886,6 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           const r = Math.sqrt(x * x + y * y);
 
           if (r > radius - padding) {
-            // If node is outside boundary, push it back
             const angle = Math.atan2(y, x);
             const targetX = (radius - padding) * Math.cos(angle);
             const targetY = (radius - padding) * Math.sin(angle);
@@ -1050,12 +897,8 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
           }
         }
       });
-
-    // Update positions on each tick
     simulation.on("tick", () => {
-      // Update category group positions
       categoryGroups.attr("transform", (d) => {
-        // Find the first node in this category to get position
         const categoryNode = data.nodes.find((n) => n.category === d);
         if (
           categoryNode &&
@@ -1066,43 +909,29 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
         }
         return "translate(0,0)";
       });
-
-      // Update link positions with curved paths
       linkElements.attr("d", (d: any) => {
         const source = d.source as ProcessedSkill;
         const target = d.target as ProcessedSkill;
-
-        // Calculate midpoint for the curve
         const midX = (source.x! + target.x!) / 2;
         const midY = (source.y! + target.y!) / 2;
-
-        // Add curvature perpendicular to the line
         const dx = target.x! - source.x!;
         const dy = target.y! - source.y!;
         const norm = Math.sqrt(dx * dx + dy * dy);
-        const curveFactor = 0.2; // Controls how much curve
+        const curveFactor = 0.2;
 
         let cpx = midX + curveFactor * -dy;
         let cpy = midY + curveFactor * dx;
-
-        // For suggested links, use a straighter path
         if (d.type === "suggested") {
           cpx = midX;
           cpy = midY;
         }
-
-        // Create a curved path
         return `M${source.x},${source.y} Q${cpx},${cpy} ${target.x},${target.y}`;
       });
-
-      // Update node positions
       nodeElements.attr(
         "transform",
         (d) => `translate(${d.x || 0},${d.y || 0})`
       );
     });
-
-    // Drag functions
     function dragstarted(
       event: d3.D3DragEvent<SVGGElement, ProcessedSkill, ProcessedSkill>,
       d: ProcessedSkill
@@ -1125,20 +954,14 @@ export function SkillGraph({ skills }: { skills: Skill[] }) {
       d: ProcessedSkill
     ) {
       if (!event.active) simulation.alphaTarget(0);
-
-      // For suggested nodes, let them return to their position
       if (d.suggested) {
         d.fx = null;
         d.fy = null;
       } else {
-        // Core nodes maintain their position
-        // but we update their cluster position
         d.clusterX = d.x;
         d.clusterY = d.y;
       }
     }
-
-    // Clean up simulation on unmount
     return () => {
       simulation.stop();
     };

@@ -25,8 +25,6 @@ import {
   getBlockchainProposalId,
   verifyAadharWithZkp,
 } from "@/lib/services/blockchain-integration";
-
-// Modal components
 import {
   Dialog,
   DialogContent,
@@ -38,8 +36,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-// Mock data fetch function (in real app, this would fetch from an API)
 const fetchStudentData = async (id: string) => {
   const data = [
     {
@@ -116,8 +112,6 @@ export default function StudentInvestmentPage() {
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState<any>(null);
-
-  // Check if the student's proposal is connected to blockchain
   const [blockchainProposalId, setBlockchainProposalId] = useState<
     number | null
   >(null);
@@ -126,8 +120,6 @@ export default function StudentInvestmentPage() {
     const loadData = async () => {
       const studentData = await fetchStudentData(id as string);
       setStudent(studentData);
-
-      // Check blockchain connection
       if (studentData) {
         const proposalId = getBlockchainProposalId(studentData.id);
         setBlockchainProposalId(proposalId);
@@ -138,8 +130,6 @@ export default function StudentInvestmentPage() {
 
     loadData();
   }, [id]);
-
-  // Check if wallet is connected
   useEffect(() => {
     const checkWalletConnection = async () => {
       if (window.ethereum) {
@@ -194,8 +184,6 @@ export default function StudentInvestmentPage() {
 
       if (result.success && result.txHash) {
         setTxHash(result.txHash);
-
-        // Update student's raised amount (in a real app, this would be handled by a backend)
         setStudent({
           ...student,
           amountRaised: student.amountRaised + parseFloat(investAmount),
@@ -213,8 +201,6 @@ export default function StudentInvestmentPage() {
   const verifyIdentity = async () => {
     setIsVerifying(true);
     setVerificationResult(null);
-
-    // For demo purposes, we'll use a hardcoded Aadhar number and sample image
     const aadharNumber = "1234-5678-9012";
     const aadharImage =
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iIzE3MjU0YyIvPjx0ZXh0IHg9IjUwJSIgeT0iMzUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFBREhBUiBDQVJEPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjEyMzQtNTY3OC05MDEyPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNjUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNhbXBsZSBOYW1lPC90ZXh0Pjxwb2x5Z29uIHBvaW50cz0iMzIwLDgwIDM2MCw4MCAzNjAsMTYwIDMyMCwxNjAiIGZpbGw9IiMzMzMiLz48L3N2Zz4=";
@@ -231,8 +217,6 @@ export default function StudentInvestmentPage() {
       setIsVerifying(false);
     }
   };
-
-  // Format wallet address for display
   const formatAddress = (address: string) => {
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4

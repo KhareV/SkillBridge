@@ -22,12 +22,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Layout from "../../components/layout/Layout";
-
-// Current user information
 const currentTime = "2025-04-11 14:07:25";
 const currentUser = "vkhare2909";
-
-// Define steps
 const steps = [
   "Personal Details",
   "Company Information",
@@ -47,21 +43,17 @@ export default function InvestorOnboardingPage() {
     investmentFocus: [],
     investmentStage: "",
     portfolioSize: "",
-    role: "investor", // Add role field
+    role: "investor",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState(null);
-
-  // Redirect if not signed in
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/sign-in");
     }
   }, [isLoaded, isSignedIn, router]);
-
-  // Pre-fill form with user data if available
   useEffect(() => {
     if (isLoaded && user) {
       setFormData((prev) => ({
@@ -71,16 +63,12 @@ export default function InvestorOnboardingPage() {
       }));
     }
   }, [isLoaded, user]);
-
-  // Handle input change for text fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    // Clear error when field is updated
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -89,16 +77,12 @@ export default function InvestorOnboardingPage() {
       });
     }
   };
-
-  // Handle investment focus change
   const handleInvestmentFocusChange = (e) => {
     const focus = e.target.value.split(",").map((item) => item.trim());
     setFormData((prev) => ({
       ...prev,
       investmentFocus: focus,
     }));
-
-    // Clear error
     if (errors.investmentFocus) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -107,8 +91,6 @@ export default function InvestorOnboardingPage() {
       });
     }
   };
-
-  // Add/remove individual investment focus
   const handleFocusItemChange = (item, action) => {
     if (action === "add" && !formData.investmentFocus.includes(item)) {
       setFormData((prev) => ({
@@ -122,14 +104,10 @@ export default function InvestorOnboardingPage() {
       }));
     }
   };
-
-  // Handle next step
   const handleNextStep = () => {
-    // Validate current step
     const currentErrors = {};
 
     if (currentStep === 0) {
-      // Validate personal details
       if (!formData.name) {
         currentErrors.name = "Name is required";
       }
@@ -139,7 +117,6 @@ export default function InvestorOnboardingPage() {
         currentErrors.email = "Email is invalid";
       }
     } else if (currentStep === 1) {
-      // Validate company details
       if (!formData.company) {
         currentErrors.company = "Company is required";
       }
@@ -147,7 +124,6 @@ export default function InvestorOnboardingPage() {
         currentErrors.position = "Position is required";
       }
     } else if (currentStep === 2) {
-      // Validate investment preferences
       if (formData.investmentFocus.length === 0) {
         currentErrors.investmentFocus =
           "Please specify at least one investment focus";
@@ -164,23 +140,17 @@ export default function InvestorOnboardingPage() {
       setErrors(currentErrors);
       return;
     }
-
-    // Go to next step
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       handleSubmit();
     }
   };
-
-  // Handle previous step
   const handlePrevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
-
-  // Handle form submission
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setApiError(null);
@@ -198,7 +168,7 @@ export default function InvestorOnboardingPage() {
 
       if (data.success) {
         toast.success("Onboarding completed successfully!");
-        router.push("/investor"); // Redirect to investor dashboard
+        router.push("/investor");
       } else {
         throw new Error(data.message || "Something went wrong");
       }
@@ -210,8 +180,6 @@ export default function InvestorOnboardingPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Sample investment focus options
   const focusOptions = [
     "Fintech",
     "EdTech",

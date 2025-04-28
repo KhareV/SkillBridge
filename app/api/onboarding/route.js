@@ -6,28 +6,18 @@ import InvestorOnboarding from "@/lib/db/models/investorOnboarding";
 
 export async function POST(request) {
   try {
-    // Parse request body
     const data = await request.json();
     console.log("Received data:", JSON.stringify(data, null, 2));
-
-    // Check for role in different possible locations based on the forms we saw
     let role = data.role;
-
-    // Handle nested data structures like in the investor onboarding form
     if (!role && data.personalDetails && data.personalDetails.role) {
       role = data.personalDetails.role;
     }
-
-    // If role is still not found but we have enough information to determine the type
     if (!role) {
-      // Check for student-specific fields
       if (data.education && data.education.institution) {
         role = "student";
       } else if (data.institution) {
         role = "student";
-      }
-      // Check for investor-specific fields
-      else if (
+      } else if (
         (data.investment && data.investment.focusAreas) ||
         data.company ||
         data.investmentFocus
@@ -46,18 +36,11 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-    // Connect to database
     await connectToDatabase();
-
-    // Save data to the appropriate collection based on role
     if (role === "student") {
-      // Check if we're dealing with the simple structure (direct properties)
-      // or the nested structure (with personalDetails, education, etc.)
       let studentModelData;
 
       if (data.name && data.email && data.institution) {
-        // Simple structure from student/page.js
         studentModelData = {
           name: data.name,
           email: data.email,
@@ -69,7 +52,6 @@ export async function POST(request) {
           role: "student",
         };
       } else {
-        // Nested structure from onboarding/page.jsx
         studentModelData = {
           name: data.personalDetails?.name || "",
           email: data.personalDetails?.email || "",
@@ -87,8 +69,6 @@ export async function POST(request) {
       }
 
       console.log("Formatted student data:", studentModelData);
-
-      // Check if all required fields are present
       if (
         !studentModelData.name ||
         !studentModelData.email ||
@@ -106,11 +86,9 @@ export async function POST(request) {
       const studentData = new StudentOnboarding(studentModelData);
       await studentData.save();
     } else if (role === "investor") {
-      // Check if we're dealing with the simple structure or the nested structure
       let investorModelData;
 
       if (data.name && data.email && data.company) {
-        // Simple structure from investor/page.js
         investorModelData = {
           name: data.name,
           email: data.email,
@@ -124,7 +102,6 @@ export async function POST(request) {
           role: "investor",
         };
       } else {
-        // Nested structure from onboarding/investor/page.jsx
         investorModelData = {
           name: data.personalDetails?.name || "",
           email: data.personalDetails?.email || "",
@@ -141,8 +118,6 @@ export async function POST(request) {
       }
 
       console.log("Formatted investor data:", investorModelData);
-
-      // Check if all required fields are present
       if (
         !investorModelData.name ||
         !investorModelData.email ||
@@ -169,8 +144,6 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Error in onboarding:", error);
-
-    // Return more detailed error message to help debugging
     return NextResponse.json(
       {
         success: false,
